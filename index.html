@@ -15,22 +15,7 @@
     <script defer src="https://www.gstatic.com/firebasejs/12.0.0/firebase-analytics-compat.js"></script>
     <script defer src="https://www.gstatic.com/firebasejs/12.0.0/firebase-remote-config-compat.js"></script>
     <script defer src="https://www.gstatic.com/firebasejs/12.0.0/firebase-performance-compat.js"></script>
-    <script>
-      // Configuración de Firebase
-      const firebaseConfig = {
-        projectId: 'infovault-reurt',
-        appId: '1:581885567157:web:249b88712d5592913fdefc',
-        storageBucket: 'infovault-reurt.appspot.com',
-        apiKey: 'AIzaSyD8k4uT-LGLs1XwqkDiquAx0WZKQOaT7Zo',
-        authDomain: 'infovault-reurt.firebaseapp.com',
-        messagingSenderId: '581885567157',
-      };
-
-      // Inicializar Firebase
-      firebase.initializeApp(firebaseConfig);
-    </script>
-
-    <style media="screen">
+    <style>
       body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
       #message { background: white; max-width: 360px; margin: 100px auto 16px; padding: 32px 24px; border-radius: 3px; }
       #message h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
@@ -54,8 +39,23 @@
     </div>
     <p id="load">Firebase SDK Loading&hellip;</p>
 
+    <!-- Inicialización de Firebase al final del body -->
     <script>
-      document.addEventListener('DOMContentLoaded', function() {
+      window.addEventListener('load', function() {
+        // Configuración de Firebase
+        const firebaseConfig = {
+          projectId: 'infovault-reurt',
+          appId: '1:581885567157:web:249b88712d5592913fdefc',
+          storageBucket: 'infovault-reurt.appspot.com',
+          apiKey: 'AIzaSyD8k4uT-LGLs1XwqkDiquAx0WZKQOaT7Zo',
+          authDomain: 'infovault-reurt.firebaseapp.com',
+          messagingSenderId: '581885567157',
+        };
+
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        // Mostrar features cargadas
         const loadEl = document.querySelector('#load');
         try {
           let app = firebase.app();
