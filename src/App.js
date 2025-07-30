@@ -56,6 +56,7 @@ try {
     firebaseConfig = JSON.parse(__firebase_config);
   } 
   // Prioridad 2: Variables de entorno (entorno de despliegue como Vercel)
+  // Se comprueba si 'process' existe para evitar errores en el navegador.
   else if (typeof process !== 'undefined' && process.env && process.env.REACT_APP_FIREBASE_CONFIG) {
     firebaseConfig = JSON.parse(process.env.REACT_APP_FIREBASE_CONFIG);
   } 
@@ -193,8 +194,9 @@ export default function App() {
                 setUserId(user.uid); 
             } else { 
                 try { 
-                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                        await signInWithCustomToken(auth, __initial_auth_token);
+                    const token = (typeof __initial_auth_token !== 'undefined') ? __initial_auth_token : null;
+                    if (token) {
+                        await signInWithCustomToken(auth, token);
                     } else {
                         await signInAnonymously(auth); 
                     }
