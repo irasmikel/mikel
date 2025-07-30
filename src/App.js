@@ -233,8 +233,12 @@ export default function App() {
         return note.title.toLowerCase().includes(searchTermLower) || note.content.toLowerCase().includes(searchTermLower) || tagsMatch;
     }), [notes, searchTerm]);
 
-    const downloadLinks = { msi: 'https://github.com/irasmikel/mikel/releases/download/v1.0.0/MFC.msi' , exe: 'https://github.com/irasmikel/mikel/releases/download/v1.0.0/mfc.exe'
-, mfcUrl: 'https://mfc.maquelsa.com/mfc3/access.php', mirrorUrl: 'https://mirror1.infodesain.com/nodeprint/access.php' };
+    const downloadLinks = { 
+        msi: 'https://github.com/irasmikel/mikel/releases/download/v1.0.0/MFC.msi', 
+        exe: 'https://github.com/irasmikel/mikel/releases/download/v1.0.0/mfc.exe', 
+        mfcUrl: 'https://mfc.maquelsa.com/mfc3/access.php', 
+        mirrorUrl: 'https://mirror1.infodesain.com/nodeprint/access.php' 
+    };
 
     return (
         <div className="bg-gray-50 min-h-screen font-sans text-gray-800">
