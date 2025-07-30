@@ -49,9 +49,27 @@ const SparklesIcon = ({ className }) => (<svg className={className} xmlns="http:
 const SpinnerIcon = ({ className }) => (<svg className={`animate-spin h-5 w-5 ${className}`} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>);
 
 // --- Configuración de Firebase ---
-const firebaseConfig = typeof __firebase_config !== 'undefined' 
-    ? JSON.parse(__firebase_config) 
-    : { apiKey: "TU_API_KEY", authDomain: "TU_AUTH_DOMAIN", projectId: "TU_PROJECT_ID", storageBucket: "TU_STORAGE_BUCKET", messagingSenderId: "TU_MESSAGING_SENDER_ID", appId: "TU_APP_ID" };
+let firebaseConfig;
+
+try {
+  // Primero, intentar con la variable global inyectada, que es la más común en este entorno.
+  if (typeof __firebase_config !== 'undefined' && __firebase_config) {
+    firebaseConfig = JSON.parse(__firebase_config);
+  } 
+  // Luego, intentar con las variables de entorno de Vercel (si existen).
+  else if (typeof process !== 'undefined' && process.env.REACT_APP_FIREBASE_CONFIG) {
+    firebaseConfig = JSON.parse(process.env.REACT_APP_FIREBASE_CONFIG);
+  } 
+  // Si ninguna funciona, lanzar un error.
+  else {
+    throw new Error("Firebase config not found");
+  }
+} catch (error) {
+    console.error("No se pudo cargar la configuración de Firebase. Asegúrate de que las variables de entorno estén configuradas.", error);
+    // Proporcionar un objeto de configuración vacío para evitar que la app se rompa por completo.
+    firebaseConfig = {};
+}
+
 
 // --- Componente de Menú Desplegable ---
 const Dropdown = ({ trigger, children }) => {
@@ -163,6 +181,11 @@ export default function App() {
     const [appId, setAppId] = useState('default-app-id');
     
     useEffect(() => {
+        if (!firebaseConfig.apiKey) {
+            console.error("La configuración de Firebase no está completa. La aplicación no puede inicializarse.");
+            setIsLoading(false);
+            return;
+        }
         const app = initializeApp(firebaseConfig);
         setDb(getFirestore(app));
         setStorage(getStorage(app));
@@ -239,6 +262,16 @@ export default function App() {
         mfcUrl: 'https://mfc.maquelsa.com/mfc3/access.php', 
         mirrorUrl: 'https://mirror1.infodesain.com/nodeprint/access.php' 
     };
+    
+    if (!firebaseConfig.apiKey) {
+        return (
+            <div className="bg-red-100 text-red-800 p-8 text-center min-h-screen flex flex-col justify-center items-center">
+                <h1 className="text-2xl font-bold mb-4">Error de Configuración</h1>
+                <p>No se ha podido cargar la configuración de Firebase.</p>
+                <p className="mt-2">Por favor, asegúrate de haber configurado las variables de entorno en Vercel correctamente.</p>
+            </div>
+        )
+    }
 
     return (
         <div className="bg-gray-50 min-h-screen font-sans text-gray-800">
