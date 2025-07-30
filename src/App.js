@@ -49,25 +49,22 @@ const SparklesIcon = ({ className }) => (<svg className={className} xmlns="http:
 const SpinnerIcon = ({ className }) => (<svg className={`animate-spin h-5 w-5 ${className}`} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>);
 
 // --- Configuración de Firebase ---
-let firebaseConfig;
-
+let firebaseConfig = {};
 try {
-  // Primero, intentar con la variable global inyectada, que es la más común en este entorno.
+  // Prioridad 1: Variable global inyectada (entorno local/Canvas)
   if (typeof __firebase_config !== 'undefined' && __firebase_config) {
     firebaseConfig = JSON.parse(__firebase_config);
   } 
-  // Luego, intentar con las variables de entorno de Vercel (si existen).
-  else if (typeof process !== 'undefined' && process.env.REACT_APP_FIREBASE_CONFIG) {
+  // Prioridad 2: Variables de entorno (entorno de despliegue como Vercel)
+  else if (typeof process !== 'undefined' && process.env && process.env.REACT_APP_FIREBASE_CONFIG) {
     firebaseConfig = JSON.parse(process.env.REACT_APP_FIREBASE_CONFIG);
   } 
-  // Si ninguna funciona, lanzar un error.
+  // Si ninguna de las dos está disponible
   else {
-    throw new Error("Firebase config not found");
+    console.warn("Configuración de Firebase no encontrada.");
   }
 } catch (error) {
-    console.error("No se pudo cargar la configuración de Firebase. Asegúrate de que las variables de entorno estén configuradas.", error);
-    // Proporcionar un objeto de configuración vacío para evitar que la app se rompa por completo.
-    firebaseConfig = {};
+    console.error("No se pudo cargar o parsear la configuración de Firebase.", error);
 }
 
 
@@ -189,11 +186,22 @@ export default function App() {
         const app = initializeApp(firebaseConfig);
         setDb(getFirestore(app));
         setStorage(getStorage(app));
-        setAppId(typeof __app_id !== 'undefined' ? __app_id : 'default-app-id');
+        setAppId(firebaseConfig.appId || 'default-app-id');
         const auth = getAuth(app);
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
-            if (user) { setUserId(user.uid); } 
-            else { try { const token = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null; if (token) { await signInWithCustomToken(auth, token); } else { await signInAnonymously(auth); } } catch (error) { console.error("Error en la autenticación:", error); } }
+            if (user) { 
+                setUserId(user.uid); 
+            } else { 
+                try { 
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth); 
+                    }
+                } catch (error) { 
+                    console.error("Error en la autenticación:", error); 
+                } 
+            }
             setIsAuthReady(true);
         });
         return () => unsubscribe();
