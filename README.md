@@ -1,90 +1,70 @@
-# Mikel - Bóveda de Información Inteligente
+# Getting Started with Create React App
 
-Mikel es una bóveda de información segura e inteligente construida con Next.js, TypeScript y Tailwind CSS. Utiliza el poder de la IA generativa con Genkit para ofrecer búsqueda inteligente y categorización automática de tus notas, contraseñas, fotos y aplicaciones.
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Características
+## Available Scripts
 
-- **Búsqueda Inteligente:** Realiza búsquedas en lenguaje natural para encontrar tus items.
-- **Sugerencias de IA:** Obtén sugerencias de categorías para organizar tu información.
-- **Gestión de Items:** Añade, edita y elimina notas, contraseñas, fotos y aplicaciones de forma segura.
-- **Interfaz Moderna:** Diseño limpio y responsivo con componentes de ShadCN UI.
-- **Despliegue Sencillo:** Configurado para un despliegue fácil con Firebase App Hosting.
+In the project directory, you can run:
 
-## Tech Stack
+### `npm start`
 
-- **Framework:** [Next.js](https://nextjs.org/)
-- **Lenguaje:** [TypeScript](https://www.typescriptlang.org/)
-- **Estilos:** [Tailwind CSS](https://tailwindcss.com/) y [ShadCN UI](https://ui.shadcn.com/)
-- **IA Generativa:** [Firebase Genkit](https://firebase.google.com/docs/genkit)
-- **Despliegue:** [Firebase App Hosting](https://firebase.google.com/docs/hosting)
+Runs the app in the development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
----
+The page will reload when you make changes.\
+You may also see any lint errors in the console.
 
-## Cómo empezar
+### `npm test`
 
-Sigue estos pasos para configurar y ejecutar el proyecto en tu entorno local.
+Launches the test runner in the interactive watch mode.\
+See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-### Prerrequisitos
+### `npm run build`
 
-- [Node.js](https://nodejs.org/en/) (v18 o superior)
-- [Firebase CLI](https://firebase.google.com/docs/cli)
+Builds the app for production to the `build` folder.\
+It correctly bundles React in production mode and optimizes the build for the best performance.
 
-### 1. Clonar el repositorio
+The build is minified and the filenames include the hashes.\
+Your app is ready to be deployed!
 
-```bash
-git clone https://github.com/tu-usuario/tu-repositorio.git
-cd tu-repositorio
-```
+See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-### 2. Crear archivo de entorno
+### `npm run eject`
 
-Crea un archivo llamado `.env` en la raíz del proyecto y copia el contenido de `.env.local`. Deberás rellenarlo con la configuración de tu propio proyecto de Firebase.
+**Note: this is a one-way operation. Once you `eject`, you can't go back!**
 
-```bash
-cp .env.local .env
-```
+If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
 
-El contenido del archivo `.env` debería ser el siguiente:
+Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
 
-```
-# Firebase Configuration
-NEXT_PUBLIC_FIREBASE_PROJECT_ID="tu-project-id"
-NEXT_PUBLIC_FIREBASE_APP_ID="tu-app-id"
-NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET="tu-storage-bucket"
-NEXT_PUBLIC_FIREBASE_API_KEY="tu-api-key"
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN="tu-auth-domain"
-NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID="tu-messaging-sender-id"
-```
+You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
 
-### 3. Instalar dependencias
+## Learn More
 
-```bash
-npm install
-```
+You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
-### 4. Ejecutar el servidor de desarrollo
+To learn React, check out the [React documentation](https://reactjs.org/).
 
-```bash
-npm run dev
-```
+### Code Splitting
 
-Abre [http://localhost:3000](http://localhost:3000) en tu navegador para ver el resultado.
+This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
 
-## Despliegue
+### Analyzing the Bundle Size
 
-Este proyecto está configurado para ser desplegado con Firebase.
+This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
 
-1. **Inicia sesión en Firebase:**
-   ```bash
-   firebase login
-   ```
-2. **Vincula tu proyecto:**
-   ```bash
-   firebase use --add
-   ```
-   (Selecciona tu proyecto de Firebase de la lista)
+### Making a Progressive Web App
 
-3. **Despliega la aplicación:**
-   ```bash
-   firebase deploy
-   ```
+This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+
+### Advanced Configuration
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+
+### Deployment
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+
+### `npm run build` fails to minify
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
