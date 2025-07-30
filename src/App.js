@@ -187,17 +187,23 @@ export default function App() {
         const app = initializeApp(firebaseConfig);
         setDb(getFirestore(app));
         setStorage(getStorage(app));
-        setAppId(firebaseConfig.appId || 'default-app-id');
+        
+        // Usar el appId de la configuración que se ha cargado
+        const loadedAppId = firebaseConfig.appId || 'default-app-id';
+        setAppId(loadedAppId);
+
         const auth = getAuth(app);
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
             if (user) { 
                 setUserId(user.uid); 
             } else { 
                 try { 
+                    // Para el entorno de Canvas, se busca el token global.
                     const token = (typeof __initial_auth_token !== 'undefined') ? __initial_auth_token : null;
                     if (token) {
                         await signInWithCustomToken(auth, token);
                     } else {
+                        // Para Vercel y otros entornos, se usa la autenticación anónima.
                         await signInAnonymously(auth); 
                     }
                 } catch (error) { 
@@ -211,7 +217,10 @@ export default function App() {
 
     useEffect(() => {
         if (!isAuthReady || !db || !userId) return;
+        
+        // Construir la ruta de la colección de forma segura
         const notesCollectionPath = `artifacts/${appId}/users/${userId}/notes`;
+
         const q = query(collection(db, notesCollectionPath));
         setIsLoading(true);
         const unsubscribe = onSnapshot(q, (querySnapshot) => {
