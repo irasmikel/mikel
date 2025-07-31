@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal de Conocimiento v5 (IA Integrada)</title>
+    <title>Portal de Conocimiento v5</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -26,6 +26,13 @@
         .search-results-container { min-height: 200px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
         .search-results-list { width: 100%; max-width: 800px; }
         .search-result-item { background-color: white; border: 1px solid #e2e8f0; padding: 16px; margin-bottom: 16px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .mobile-menu {
+            transition: transform 0.3s ease-in-out;
+            transform: translateX(100%);
+        }
+        .mobile-menu.active {
+            transform: translateX(0);
+        }
     </style>
 </head>
 <body class="antialiased text-gray-800">
@@ -51,10 +58,11 @@
         let allNotes = [];
         let DOM = {};
 
-        // API de Google Custom Search - Clave y CSE ID actualizados
         const GOOGLE_API_KEY = "AIzaSyDbwINNjAmw9-eL5dygCvuSmbJxdZMbwJg";
         const SEARCH_ENGINE_ID = "f6867d96a7dce4c9c";
         const SEARCH_SITE = "copytechnet.com";
+        const GEMINI_API_KEY = "AIzaSyDn1rKLZsifC5H9KY1Wq5L3ZeVYEMCeF3w";
+
 
         window.onload = () => {
             initializeDOMElements();
@@ -113,6 +121,10 @@
                 suggestTagsButton: document.getElementById('suggestTagsButton'),
                 searchWebButton: document.getElementById('searchWebButton'),
                 webSearchResultsContainer: document.getElementById('web-search-results'),
+                // Nuevos elementos para el menú móvil
+                menuToggleBtn: document.getElementById('menuToggleBtn'),
+                mobileMenu: document.getElementById('mobileMenu'),
+                closeMobileMenuBtn: document.getElementById('closeMobileMenuBtn'),
             };
         }
 
@@ -134,6 +146,9 @@
             DOM.suggestTagsButton.addEventListener('click', suggestTagsWithAI);
             // Event Listener para la búsqueda en la red
             DOM.searchWebButton.addEventListener('click', () => performSearch(DOM.mainSearchInput.value, 'web'));
+            // Event listeners para el menú móvil
+            if (DOM.menuToggleBtn) DOM.menuToggleBtn.addEventListener('click', () => DOM.mobileMenu.classList.add('active'));
+            if (DOM.closeMobileMenuBtn) DOM.closeMobileMenuBtn.addEventListener('click', () => DOM.mobileMenu.classList.remove('active'));
         }
 
         function showView(viewName) {
@@ -152,7 +167,6 @@
             }
         }
 
-        // --- Funcionalidad de Búsqueda en la Red ---
         async function searchWeb(searchTerm) {
             if (!searchTerm) {
                 showToast("Introduce un término de búsqueda para buscar en la web.", "error");
@@ -164,7 +178,8 @@
             }
 
             DOM.webSearchResultsContainer.innerHTML = `<div class="search-results-container"><i class="fas fa-spinner fa-spin fa-3x text-blue-500"></i><p class="mt-2 text-gray-600">Buscando en la web...</p></div>`;
-            const url = `https://www.googleapis.com/customsearch/v1?key=${GOOGLE_API_KEY}&cx=${SEARCH_ENGINE_ID}&q=${encodeURIComponent(searchTerm)}&siteSearch=${SEARCH_SITE}`;
+            
+            const searchUrl = `https://www.googleapis.com/customsearch/v1?key=${GOOGLE_API_KEY}&cx=${SEARCH_ENGINE_ID}&q=${encodeURIComponent(searchTerm)}&siteSearch=${SEARCH_SITE}`;
             
             try {
                 const response = await fetch(url);
@@ -174,6 +189,7 @@
                 console.error("Error al buscar en la web:", error);
                 DOM.webSearchResultsContainer.innerHTML = `<div class="search-results-container"><p class="text-red-500">Error al realizar la búsqueda en la web. Revisa la consola para más detalles.</p></div>`;
             }
+
         }
 
         function renderWebSearchResults(items) {
@@ -191,15 +207,16 @@
             }
             DOM.webSearchResultsContainer.innerHTML = `<div class="p-6">${resultsHTML}</div>`;
         }
-        
-        // --- Funcionalidad de IA del INDEX-ONDO-3107.html ---
+
         async function callAI(prompt, button) {
-            const originalText = button.innerHTML;
-            button.disabled = true;
-            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            let originalText = '';
+            if (button) {
+                originalText = button.innerHTML;
+                button.disabled = true;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            }
             try {
-                // Clave de API de Gemini actualizada
-                const apiKey = "AIzaSyDn1rKLZsifC5H9KY1Wq5L3ZeVYEMCeF3w";
+                const apiKey = GEMINI_API_KEY;
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
                 const payload = { contents: [{ parts: [{ text: prompt }] }] };
                 const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
@@ -211,8 +228,10 @@
                 showToast("Error de comunicación con la IA.", "error");
                 return null;
             } finally {
-                button.disabled = false;
-                button.innerHTML = originalText;
+                if (button) {
+                    button.disabled = false;
+                    button.innerHTML = originalText;
+                }
             }
         }
 
@@ -499,7 +518,7 @@
                 <div class="flex items-center">
                     <button id="logoButton" class="flex items-center gap-2 text-xl font-bold text-gray-800"><span class="bg-gray-800 text-white rounded-md w-7 h-7 flex items-center justify-center"><i class="fa-solid fa-plus"></i></span> Mikel</button>
                 </div>
-                <div class="flex items-center gap-3">
+                <nav class="hidden md:flex items-center gap-3">
                     <button id="viewAllButton" class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
                         <i class="fa-solid fa-list"></i> Ver Todo
                     </button>
@@ -509,10 +528,32 @@
                     <button id="addItemButtonHeader" class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-gray-800 rounded-md hover:bg-gray-900">
                         <i class="fa-solid fa-plus"></i> Añadir Item
                     </button>
-                </div>
+                </nav>
+                <button id="menuToggleBtn" class="md:hidden text-gray-700 text-2xl">
+                    <i class="fas fa-bars"></i>
+                </button>
             </div>
         </div>
     </header>
+
+    <div id="mobileMenu" class="fixed top-0 right-0 h-full w-64 bg-white shadow-lg p-6 z-50 mobile-menu md:hidden">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-bold">Menú</h3>
+            <button id="closeMobileMenuBtn" class="text-gray-700 text-2xl"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="flex flex-col space-y-4">
+            <button id="mobileViewAllButton" class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50" onclick="document.getElementById('viewAllButton').click(); DOM.mobileMenu.classList.remove('active');">
+                <i class="fa-solid fa-list"></i> Ver Todo
+            </button>
+            <button id="mobileMfcButton" class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50" onclick="document.getElementById('mfcButton').click(); DOM.mobileMenu.classList.remove('active');">
+                <i class="fa-solid fa-download"></i> Recursos
+            </button>
+            <button id="mobileAddItemButton" class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-gray-800 rounded-md hover:bg-gray-900" onclick="document.getElementById('addItemButtonHeader').click(); DOM.mobileMenu.classList.remove('active');">
+                <i class="fa-solid fa-plus"></i> Añadir Item
+            </button>
+        </div>
+    </div>
+
 
     <main id="app-main" class="container mx-auto p-4 sm:p-6 lg:p-8 hidden">
         <div id="toast-container"></div>
