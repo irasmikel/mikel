@@ -61,8 +61,6 @@
         const GOOGLE_API_KEY = "AIzaSyDbwINNjAmw9-eL5dygCvuSmbJxdZMbwJg";
         const SEARCH_ENGINE_ID = "f6867d96a7dce4c9c";
         const SEARCH_SITE = "copytechnet.com";
-        const GEMINI_API_KEY = "AIzaSyDn1rKLZsifC5H9KY1Wq5L3ZeVYEMCeF3w";
-
 
         window.onload = () => {
             initializeDOMElements();
@@ -120,6 +118,7 @@
                 improveContentButton: document.getElementById('improveContentButton'),
                 suggestTagsButton: document.getElementById('suggestTagsButton'),
                 searchWebButton: document.getElementById('searchWebButton'),
+                searchGoogleButton: document.getElementById('searchGoogleButton'), // Nuevo botón para Google
                 webSearchResultsContainer: document.getElementById('web-search-results'),
                 menuToggleBtn: document.getElementById('menuToggleBtn'),
                 mobileMenu: document.getElementById('mobileMenu'),
@@ -140,9 +139,12 @@
             DOM.noteAttachmentInput.addEventListener('change', handleFileSelect);
             DOM.removeFileButton.addEventListener('click', removeSelectedFile);
             DOM.cancelButton.addEventListener('click', () => toggleModal('confirmationModal', false));
-            DOM.improveContentButton.addEventListener('click', improveContentWithAI);
-            DOM.suggestTagsButton.addEventListener('click', suggestTagsWithAI);
-            DOM.searchWebButton.addEventListener('click', () => performSearch(DOM.mainSearchInput.value, 'web'));
+            // Funcionalidad de IA deshabilitada
+            DOM.improveContentButton.addEventListener('click', () => showToast("Funcionalidad IA no implementada en esta versión.", "error"));
+            DOM.suggestTagsButton.addEventListener('click', () => showToast("Funcionalidad IA no implementada en esta versión.", "error"));
+            // Event Listener para la búsqueda en la red
+            DOM.searchWebButton.addEventListener('click', () => performSearch(DOM.mainSearchInput.value, 'copytech'));
+            DOM.searchGoogleButton.addEventListener('click', () => performSearch(DOM.mainSearchInput.value, 'google'));
             if (DOM.menuToggleBtn) DOM.menuToggleBtn.addEventListener('click', () => DOM.mobileMenu.classList.add('active'));
             if (DOM.closeMobileMenuBtn) DOM.closeMobileMenuBtn.addEventListener('click', () => DOM.mobileMenu.classList.remove('active'));
         }
@@ -157,13 +159,14 @@
             if (type === 'db') {
                 filterNotes(searchTerm);
                 showView('items');
-            } else if (type === 'web') {
-                searchWeb(searchTerm);
-                showView('web-search');
+            } else if (type === 'copytech') {
+                searchWeb(searchTerm, SEARCH_SITE);
+            } else if (type === 'google') {
+                searchWeb(searchTerm, null);
             }
         }
 
-        async function searchWeb(searchTerm) {
+        async function searchWeb(searchTerm, site) {
             if (!searchTerm) {
                 showToast("Introduce un término de búsqueda para buscar en la web.", "error");
                 return;
@@ -175,7 +178,7 @@
 
             DOM.webSearchResultsContainer.innerHTML = `<div class="search-results-container"><i class="fas fa-spinner fa-spin fa-3x text-blue-500"></i><p class="mt-2 text-gray-600">Buscando en la web...</p></div>`;
             
-            const url = `https://www.googleapis.com/customsearch/v1?key=${GOOGLE_API_KEY}&cx=${SEARCH_ENGINE_ID}&q=${encodeURIComponent(searchTerm)}&siteSearch=${SEARCH_SITE}`;
+            const url = `https://www.googleapis.com/customsearch/v1?key=${GOOGLE_API_KEY}&cx=${SEARCH_ENGINE_ID}&q=${encodeURIComponent(searchTerm)}${site ? `&siteSearch=${site}` : ''}`;
             
             try {
                 const response = await fetch(url);
@@ -211,7 +214,7 @@
                 button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
             }
             try {
-                const apiKey = GEMINI_API_KEY;
+                const apiKey = "AIzaSyDn1rKLZsifC5H9KY1Wq5L3ZeVYEMCeF3w";
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
                 const payload = { contents: [{ parts: [{ text: prompt }] }] };
                 const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
@@ -231,57 +234,11 @@
         }
 
         async function improveContentWithAI() {
-            const rawContent = DOM.noteContentInput.value.trim();
-            if (!rawContent) {
-                showToast("Escribe algo en el contenido primero.", "error");
-                return;
-            }
-            const prompt = `
-                **Rol:** Eres un asistente experto en la creación de documentación técnica para un técnico de campo.
-                **Tarea:** Toma las siguientes notas en bruto y transfórmalas en una ficha de solución clara y profesional.
-                **Formato de Salida Obligatorio (Markdown):**
-                ### Causa Probable
-                (Describe el origen del problema)
-                ### Pasos para la Solución
-                (Usa una lista numerada para los pasos)
-                ### Recomendación Adicional
-                (Ofrece un consejo final si la solución no funciona)
-                
-                **Notas en bruto del técnico:**
-                "${rawContent}"
-            `;
-            const improvedContent = await callAI(prompt, DOM.improveContentButton);
-            if (improvedContent) {
-                DOM.noteContentInput.value = improvedContent;
-                showToast("Contenido mejorado con IA.", "success");
-            }
+            showToast("Funcionalidad IA no implementada en esta versión.", "error");
         }
 
         async function suggestTagsWithAI() {
-            const title = DOM.noteTitleInput.value.trim();
-            const content = DOM.noteContentInput.value.trim();
-            if (!title && !content) {
-                showToast("Escribe un título o contenido para sugerir etiquetas.", "error");
-                return;
-            }
-            const prompt = `
-                **Rol:** Eres un experto en catalogación de documentación técnica.
-                **Tarea:** Lee el siguiente título y contenido sobre un problema técnico y genera una lista de 3 a 5 etiquetas clave.
-                **Reglas para las etiquetas:**
-                - Deben ser cortas y relevantes.
-                - En minúsculas.
-                - Separadas por comas.
-                - Usa guiones en lugar de espacios (ej: 'error-fusor').
-                - Incluye la marca y el código de error si se mencionan.
-                
-                **Título:** ${title}
-                **Contenido:** ${content}
-            `;
-            const suggestedTags = await callAI(prompt, DOM.suggestTagsButton);
-            if (suggestedTags) {
-                DOM.noteTagsInput.value = suggestedTags;
-                showToast("Etiquetas sugeridas.", "success");
-            }
+            showToast("Funcionalidad IA no implementada en esta versión.", "error");
         }
 
         function toggleModal(modalId, show) {
@@ -560,7 +517,8 @@
                     <div class="relative w-full shadow-lg rounded-full flex">
                         <input type="text" id="mainSearchInput" placeholder="Busca en tus notas o en la red..." class="flex-grow pl-6 pr-4 py-4 border border-gray-200 rounded-l-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                         <button id="mainSearchButton" class="px-6 bg-gray-800 text-white hover:bg-gray-900 transition-colors">Buscar</button>
-                        <button id="searchWebButton" class="px-6 bg-blue-600 text-white rounded-r-full hover:bg-blue-700 transition-colors">Web</button>
+                        <button id="searchWebButton" class="px-6 bg-blue-600 text-white hover:bg-blue-700 transition-colors">Copytech</button>
+                        <button id="searchGoogleButton" class="px-6 bg-yellow-500 text-white rounded-r-full hover:bg-yellow-600 transition-colors">Google</button>
                     </div>
                 </div>
             </div>
