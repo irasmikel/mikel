@@ -55,6 +55,8 @@
         const GOOGLE_API_KEY = "AIzaSyDbwINNjAmw9-eL5dygCvuSmbJxdZMbwJg";
         const SEARCH_ENGINE_ID = "f6867d96a7dce4c9c";
         const SEARCH_SITE = "copytechnet.com";
+        const GEMINI_API_KEY = "AIzaSyDn1rKLZsifC5H9KY1Wq5L3ZeVYEMCeF3w";
+
 
         window.onload = () => {
             initializeDOMElements();
@@ -175,31 +177,71 @@
                 DOM.webSearchResultsContainer.innerHTML = `<div class="search-results-container"><p class="text-red-500">Error al realizar la búsqueda en la web. Revisa la consola para más detalles.</p></div>`;
             }
         }
-
-        function renderWebSearchResults(items) {
+        
+        async function renderWebSearchResults(items) {
             let resultsHTML = '';
             if (items && items.length > 0) {
-                resultsHTML = items.map(item => `
-                    <div class="search-result-item">
-                        <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="text-xl font-bold text-blue-700 hover:underline">${item.title}</a>
-                        <p class="text-sm text-gray-600 mt-1">${item.snippet}</p>
-                        <span class="text-xs text-green-700">${item.displayLink}</span>
-                    </div>
-                `).join('');
+                const promises = items.map(async (item) => {
+                    const summarizedContent = await scrapeAndSummarizeWithAI(item.link);
+                    return `
+                        <div class="search-result-item">
+                            <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="text-xl font-bold text-blue-700 hover:underline">${item.title}</a>
+                            <div class="text-sm text-gray-800 mt-2 whitespace-pre-wrap">${summarizedContent || item.snippet}</div>
+                            <span class="text-xs text-green-700 mt-2 block">${item.displayLink}</span>
+                        </div>
+                    `;
+                });
+                resultsHTML = (await Promise.all(promises)).join('');
             } else {
                 resultsHTML = `<div class="search-results-container"><p class="text-gray-500">No se encontraron resultados en la web.</p></div>`;
             }
             DOM.webSearchResultsContainer.innerHTML = `<div class="p-6">${resultsHTML}</div>`;
         }
+
+        async function scrapeAndSummarizeWithAI(url) {
+            // Esta función intentará obtener el contenido de la URL y resumirlo con IA
+            try {
+                // **ADVERTENCIA:** La siguiente línea puede fallar por problemas de CORS.
+                // Si falla, necesitas un proxy del lado del servidor para obtener el contenido.
+                const response = await fetch(url);
+                const htmlContent = await response.text();
+
+                // Eliminar tags HTML para obtener solo texto
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(htmlContent, "text/html");
+                const textContent = doc.body.textContent || "";
+                
+                // Prompt para la IA para resumir el contenido
+                const prompt = `
+                    **Rol:** Eres un asistente experto en la creación de documentación técnica.
+                    **Tarea:** Analiza el siguiente texto de un sitio web y resume los puntos clave sobre la causa probable, los pasos para la solución y cualquier recomendación adicional. Si el texto no tiene información relevante, di "No se encontró información relevante.".
+                    **Formato de Salida Obligatorio (Markdown):**
+                    ### Causa Probable
+                    ### Pasos para la Solución
+                    ### Recomendación Adicional
+                    
+                    **Texto del sitio web:**
+                    "${textContent.substring(0, 5000)}..."
+                `;
+                return await callAI(prompt, null); // Pasamos null porque no hay un botón específico para esta llamada
+            } catch (error) {
+                console.error("Error al obtener y resumir la página:", error);
+                showToast("Error al procesar la página web con IA.", "error");
+                return null;
+            }
+        }
         
         // --- Funcionalidad de IA del INDEX-ONDO-3107.html ---
         async function callAI(prompt, button) {
-            const originalText = button.innerHTML;
-            button.disabled = true;
-            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            let originalText = '';
+            if (button) {
+                originalText = button.innerHTML;
+                button.disabled = true;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            }
             try {
-                // Clave de API de Gemini
-                const apiKey = "TU_CLAVE_DE_API_DE_GEMINI";
+                // Clave de API de Gemini actualizada
+                const apiKey = GEMINI_API_KEY;
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
                 const payload = { contents: [{ parts: [{ text: prompt }] }] };
                 const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
@@ -211,8 +253,10 @@
                 showToast("Error de comunicación con la IA.", "error");
                 return null;
             } finally {
-                button.disabled = false;
-                button.innerHTML = originalText;
+                if (button) {
+                    button.disabled = false;
+                    button.innerHTML = originalText;
+                }
             }
         }
 
@@ -599,6 +643,6 @@
             <div class="p-6 text-center"><i class="fas fa-exclamation-triangle fa-3x text-yellow-400 mb-4"></i><h3 class="text-xl font-bold text-gray-800">Confirmación Requerida</h3><p id="confirmationMessage" class="text-gray-600 my-4">¿Estás seguro?</p></div>
             <div class="bg-gray-50 p-4 flex justify-center gap-4 rounded-b-xl"><button id="cancelButton" class="px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">Cancelar</button><button id="confirmButton" class="px-6 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700">Confirmar</button></div>
         </div>
-    </div>
+    </div
 </body>
 </html>
