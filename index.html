@@ -23,18 +23,19 @@
         .toast.show { opacity: 1; transform: translateX(0); }
         .toast.success { background-color: #d1fae5; color: #065f46; }
         .toast.error { background-color: #fee2e2; color: #991b1b; }
-        #login-view { transition: opacity 0.5s ease; }
     </style>
 </head>
 <body class="antialiased text-gray-800">
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app-compat.js";
-        import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore-compat.js";
-        import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-storage-compat.js";
-        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth-compat.js";
+    <script>
+        // Utiliza las librerías compat de Firebase para mantener la sintaxis original
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-storage-compat.js"></script>
 
-
+    <script>
         const firebaseConfig = {
             apiKey: "AIzaSyA26sad8msWrNTVByMs8umSUV_OJsqctuE",
             authDomain: "mikelaneako.firebaseapp.com",
@@ -44,33 +45,37 @@
             appId: "1:261413636045:web:717b7e87d84a345e816684"
         };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const storage = getStorage(app);
-        const auth = getAuth(app);
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+        const auth = firebase.auth();
         
         let allNotes = [];
-        let DOM = {}; // Define DOM object globally
+        let DOM = {};
 
         window.onload = () => {
             initializeDOMElements();
             setupEventListeners();
-            signInAnonymously(auth).then(() => {
+            
+            // Direct anonymous sign-in on page load, no password needed
+            auth.signInAnonymously().then(() => {
                 console.log("Signed in anonymously.");
-                DOM.loginView.classList.add('hidden'); // Hide the login view once authenticated
                 DOM.appHeader.classList.remove('hidden');
                 DOM.appMain.classList.remove('hidden');
-                showView('search'); // Show default view after login
+                showView('search');
                 loadNotes();
             }).catch((error) => {
-                console.error("Error signing in anonymously:", error);
-                showToast("Error de autenticación anónima.", "error");
+                console.error("Error al iniciar sesión anónimamente:", error);
+                showToast("Error de autenticación. La aplicación puede no funcionar correctamente.", "error");
+                // Todavía mostrar el encabezado/aplicación principal incluso si falla el inicio de sesión anónimo
+                DOM.appHeader.classList.remove('hidden');
+                DOM.appMain.classList.remove('hidden');
+                showView('search');
             });
         };
 
         function initializeDOMElements() {
             DOM = {
-                loginView: document.getElementById('login-view'),
                 appHeader: document.getElementById('app-header'),
                 appMain: document.getElementById('app-main'),
                 mainSearchView: document.getElementById('main-search-view'),
@@ -105,9 +110,9 @@
                 confirmButton: document.getElementById('confirmButton'),
                 cancelButton: document.getElementById('cancelButton'),
                 toastContainer: document.getElementById('toast-container'),
-                improveContentButton: document.getElementById('improveContentButton'), // Keep for visual, no functionality
-                suggestTagsButton: document.getElementById('suggestTagsButton'), // Keep for visual, no functionality
-                signOutButton: document.getElementById('signOutButton'), // Keep for visual, no functionality
+                improveContentButton: document.getElementById('improveContentButton'),
+                suggestTagsButton: document.getElementById('suggestTagsButton'),
+                // signOutButton: document.getElementById('signOutButton'), // Eliminado
             };
         }
 
@@ -124,10 +129,10 @@
             DOM.noteAttachmentInput.addEventListener('change', handleFileSelect);
             DOM.removeFileButton.addEventListener('click', removeSelectedFile);
             DOM.cancelButton.addEventListener('click', () => toggleModal('confirmationModal', false));
-            // These buttons are for aesthetics only, as the original index.html doesn't have AI integration
+            // Estos botones son solo para estética, ya que el index.html original no tiene integración con IA
             DOM.improveContentButton.addEventListener('click', () => showToast("Funcionalidad IA no implementada en esta versión.", "error"));
             DOM.suggestTagsButton.addEventListener('click', () => showToast("Funcionalidad IA no implementada en esta versión.", "error"));
-            DOM.signOutButton.addEventListener('click', () => showToast("Cerrar sesión no implementado en esta versión (sesión anónima).", "error"));
+            // Eliminado el event listener para signOutButton
         }
 
         function showView(viewName) {
@@ -159,10 +164,10 @@
             resetAddNoteForm();
             DOM.modalTitle.textContent = "Editar Item";
             DOM.noteIdToEdit.value = note.id;
-            DOM.noteTitleInput.value = note.titulo; // Usa 'titulo' del original
-            DOM.noteContentInput.value = note.descripcion; // Usa 'descripcion' del original
+            DOM.noteTitleInput.value = note.titulo;
+            DOM.noteContentInput.value = note.descripcion;
             DOM.noteTagsInput.value = note.tags ? note.tags.join(', ') : '';
-            if (note.fileURL) { // Usa 'fileURL' del original
+            if (note.fileURL) {
                 const fileName = note.fileURL.substring(note.fileURL.lastIndexOf('/') + 1);
                 showSelectedFile(fileName);
             }
@@ -194,23 +199,21 @@
         
         async function uploadFile(file) {
             if (!file) return null;
-            const storageRef = ref(storage, "adjuntos/" + Date.now() + "-" + file.name); // Coincide con la ruta original
-            await uploadBytes(storageRef, file);
-            const downloadURL = await getDownloadURL(storageRef);
-            return { url: downloadURL, path: "adjuntos/" + Date.now() + "-" + file.name, name: file.name }; // Guardar la ruta y el nombre del archivo
+            const storageRef = storage.ref("adjuntos/" + Date.now() + "-" + file.name);
+            await storageRef.put(file);
+            const downloadURL = await storageRef.getDownloadURL();
+            return { url: downloadURL, path: "adjuntos/" + Date.now() + "-" + file.name, name: file.name };
         }
 
         // --- CRUD OPERATIONS ---
         function loadNotes() {
             DOM.loadingIndicator.classList.remove('hidden');
-            const q = query(collection(db, "notas"), orderBy("fecha", "desc"));
-            
-            onSnapshot(q, (snapshot) => {
+            db.collection("notas").orderBy("fecha", "desc").onSnapshot((snapshot) => {
                 allNotes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 renderNotes(allNotes); 
                 DOM.loadingIndicator.classList.add('hidden');
             }, (error) => {
-                console.error("Error loading notes: ", error);
+                console.error("Error al cargar las notas: ", error);
                 showToast("Error al cargar las notas.", "error");
                 DOM.loadingIndicator.classList.add('hidden');
             });
@@ -243,10 +246,9 @@
                         filePath = attachment.path;
                         fileName = attachment.name;
                     } else {
-                        throw new Error("Failed to upload attachment.");
+                        throw new Error("Error al subir el archivo adjunto.");
                     }
                 } else if (noteId && !DOM.fileChosenContainer.classList.contains('hidden')) {
-                    // Si se está editando y el archivo no se cambió pero estaba presente, mantener el existente
                     const existingNote = allNotes.find(n => n.id === noteId);
                     if (existingNote) {
                         fileURL = existingNote.fileURL;
@@ -254,11 +256,10 @@
                         fileName = existingNote.fileName; 
                     }
                 } else if (noteId && DOM.fileChosenContainer.classList.contains('hidden')) {
-                    // Si se está editando y el archivo existente fue eliminado explícitamente
                     const existingNote = allNotes.find(n => n.id === noteId);
                     if (existingNote && existingNote.filePath) { 
-                        const oldStorageRef = ref(storage, existingNote.filePath);
-                        await deleteObject(oldStorageRef).catch(err => console.warn("Old file not found or could not be deleted.", err));
+                        const oldStorageRef = storage.ref(existingNote.filePath);
+                        await oldStorageRef.delete().catch(err => console.warn("Archivo antiguo no encontrado o no pudo ser eliminado.", err));
                     }
                     fileURL = null;
                     filePath = null;
@@ -266,20 +267,20 @@
                 }
 
                 const noteData = { 
-                    titulo: title, // Coincide con el nombre de campo original
-                    descripcion: content, // Coincide con el nombre de campo original
+                    titulo: title,
+                    descripcion: content,
                     tags: tags,
-                    fileURL: fileURL, // Coincide con el nombre de campo original
-                    filePath: filePath, // Añadir esto para guardar la ruta para el borrado
-                    fileName: fileName, // Añadir esto para guardar el nombre para la visualización
-                    fecha: new Date() // Coincide con el nombre de campo original
+                    fileURL: fileURL,
+                    filePath: filePath,
+                    fileName: fileName,
+                    fecha: firebase.firestore.Timestamp.fromDate(new Date())
                 };
 
                 if (noteId) {
                     await db.collection("notas").doc(noteId).update(noteData);
                     showToast("Item actualizado.", "success");
                 } else {
-                    await addDoc(collection(db, "notas"), noteData);
+                    await db.collection("notas").add(noteData);
                     showToast("Item añadido.", "success");
                 }
                 toggleModal('addNoteModal', false);
@@ -300,14 +301,14 @@
             try {
                 const noteRef = db.collection("notas").doc(noteId);
                 const noteDoc = await noteRef.get();
-                if (noteDoc.exists && noteDoc.data().filePath) { // Usar filePath para borrar del storage
-                    const storageRef = ref(storage, noteDoc.data().filePath);
-                    await deleteObject(storageRef).catch(err => console.warn("File not found or could not be deleted from storage.", err));
+                if (noteDoc.exists && noteDoc.data().filePath) {
+                    const storageRef = storage.ref(noteDoc.data().filePath);
+                    await storageRef.delete().catch(err => console.warn("Archivo no encontrado o no pudo ser eliminado del almacenamiento.", err));
                 }
-                await deleteDoc(noteRef);
+                await noteRef.delete();
                 showToast("Nota eliminada.", "success");
             } catch (error) {
-                console.error("Error deleting note: ", error);
+                console.error("Error al eliminar la nota: ", error);
                 showToast('No se pudo eliminar la nota.', 'error');
             }
         }
@@ -316,12 +317,12 @@
         function renderNotes(notes) {
             DOM.notesContainer.innerHTML = '';
             DOM.noResultsMessage.classList.toggle('hidden', notes.length > 0 || allNotes.length === 0);
-            DOM.noNotesMessage.classList.toggle('hidden', allNotes.length > 0);
+            DOM.noNotesMessage.classList.toggle('hidden', allNotes.length === 0 && notes.length === 0);
             notes.forEach(note => {
                 const noteElement = document.createElement('div');
                 noteElement.className = 'note-card bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex flex-col';
                 const tagsHTML = (note.tags && note.tags.length > 0) ? `<div class="flex flex-wrap gap-2 mb-3">${note.tags.map(tag => `<span class="tag">${escapeHTML(tag)}</span>`).join('')}</div>` : '';
-                const attachmentHTML = note.fileURL ? `<a href="${note.fileURL}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-sm text-blue-600 hover:underline mt-3 pt-3 border-t border-gray-100"><i class="fas fa-paperclip"></i><span>${escapeHTML(note.fileName || 'Adjunto')}</span></a>` : ''; // Usar fileName si está disponible
+                const attachmentHTML = note.fileURL ? `<a href="${note.fileURL}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-sm text-blue-600 hover:underline mt-3 pt-3 border-t border-gray-100"><i class="fas fa-paperclip"></i><span>${escapeHTML(note.fileName || 'Adjunto')}</span></a>` : '';
                 const date = note.fecha ? new Date(note.fecha.seconds * 1000).toLocaleString() : 'N/A';
                 noteElement.innerHTML = `<div class="flex-grow"><div class="flex justify-between items-start mb-2"><h3 class="text-xl font-bold text-gray-900 pr-4">${escapeHTML(note.titulo)}</h3><div class="flex items-center gap-3"><button data-id="${note.id}" class="edit-note-btn text-gray-400 hover:text-blue-500"><i class="fas fa-pencil-alt"></i></button><button data-id="${note.id}" class="delete-note-btn text-gray-400 hover:text-red-500"><i class="fas fa-trash-alt"></i></button></div></div><p class="text-gray-600 whitespace-pre-wrap mb-4">${escapeHTML(note.descripcion)}</p></div><div>${tagsHTML}${attachmentHTML}<div class="text-right text-xs text-gray-400 mt-4">${date}</div></div>`;
                 DOM.notesContainer.appendChild(noteElement);
@@ -334,7 +335,7 @@
             const term = searchTerm.toLowerCase();
             DOM.searchInput.value = term;
             DOM.mainSearchInput.value = term;
-            const filtered = allNotes.filter(n => n.titulo.toLowerCase().includes(term) || n.descripcion.toLowerCase().includes(term) || (n.tags && n.tags.some(t => t.toLowerCase().includes(term))) || (n.fileName && n.fileName.toLowerCase().includes(term))); // Filtrar también por fileName
+            const filtered = allNotes.filter(n => n.titulo.toLowerCase().includes(term) || n.descripcion.toLowerCase().includes(term) || (n.tags && n.tags.some(t => t.toLowerCase().includes(term))) || (n.fileName && n.fileName.toLowerCase().includes(term)));
             renderNotes(filtered);
         }
         
@@ -367,14 +368,6 @@
         }
     </script>
 
-    <div id="login-view" class="fixed inset-0 bg-gray-900 bg-opacity-95 flex items-center justify-center z-[100]">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm p-8 text-center">
-            <div class="flex justify-center items-center gap-3 mb-4"><span class="bg-gray-800 text-white rounded-md w-12 h-12 flex items-center justify-center text-xl"><i class="fa-solid fa-lock"></i></span></div>
-            <h2 class="text-2xl font-bold text-gray-800 mb-2">Acceso Protegido</h2>
-            <p class="text-gray-500 mb-6">Iniciando sesión anónima...</p>
-             </div>
-    </div>
-
     <header id="app-header" class="bg-white/80 backdrop-blur-lg sticky top-0 z-40 border-b border-gray-200 hidden">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
@@ -391,10 +384,7 @@
                     <button id="addItemButtonHeader" class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-gray-800 rounded-md hover:bg-gray-900">
                         <i class="fa-solid fa-plus"></i> Añadir Item
                     </button>
-                    <button id="signOutButton" class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 bg-white border border-red-300 rounded-md hover:bg-red-50 hover:text-white transition-colors">
-                        <i class="fa-solid fa-right-from-bracket"></i> Salir
-                    </button>
-                </div>
+                    </div>
             </div>
         </div>
     </header>
