@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal de Conocimiento v5</title>
+    <title>Mikel</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -60,8 +60,7 @@
 
         const GOOGLE_API_KEY = "AIzaSyDbwINNjAmw9-eL5dygCvuSmbJxdZMbwJg";
         const SEARCH_ENGINE_ID = "f6867d96a7dce4c9c";
-        const SEARCH_SITE = "copytechnet.com";
-
+        
         window.onload = () => {
             initializeDOMElements();
             setupEventListeners();
@@ -115,9 +114,7 @@
                 confirmButton: document.getElementById('confirmButton'),
                 cancelButton: document.getElementById('cancelButton'),
                 toastContainer: document.getElementById('toast-container'),
-                // Eliminados los botones de IA del DOM
                 searchWebButton: document.getElementById('searchWebButton'),
-                searchGoogleButton: document.getElementById('searchGoogleButton'),
                 webSearchResultsContainer: document.getElementById('web-search-results'),
                 menuToggleBtn: document.getElementById('menuToggleBtn'),
                 mobileMenu: document.getElementById('mobileMenu'),
@@ -138,9 +135,7 @@
             DOM.noteAttachmentInput.addEventListener('change', handleFileSelect);
             DOM.removeFileButton.addEventListener('click', removeSelectedFile);
             DOM.cancelButton.addEventListener('click', () => toggleModal('confirmationModal', false));
-            // Event Listeners para los botones de búsqueda web
-            DOM.searchWebButton.addEventListener('click', () => performSearch(DOM.mainSearchInput.value, 'copytech'));
-            DOM.searchGoogleButton.addEventListener('click', () => performSearch(DOM.mainSearchInput.value, 'google'));
+            DOM.searchWebButton.addEventListener('click', () => performSearch(DOM.mainSearchInput.value, 'web'));
             if (DOM.menuToggleBtn) DOM.menuToggleBtn.addEventListener('click', () => DOM.mobileMenu.classList.add('active'));
             if (DOM.closeMobileMenuBtn) DOM.closeMobileMenuBtn.addEventListener('click', () => DOM.mobileMenu.classList.remove('active'));
         }
@@ -155,46 +150,60 @@
             if (type === 'db') {
                 filterNotes(searchTerm);
                 showView('items');
-            } else if (type === 'copytech') {
-                searchWeb(searchTerm, SEARCH_SITE);
-                showView('web-search');
-            } else if (type === 'google') {
-                searchWeb(searchTerm, null);
+            } else if (type === 'web') {
+                searchWeb(searchTerm);
                 showView('web-search');
             }
-        }
-
-        async function searchWeb(searchTerm, site) {
-            if (!searchTerm) {
-                showToast("Introduce un término de búsqueda.", "error");
-                return;
-            }
-            if (!GOOGLE_API_KEY) {
-                showToast("Error: La clave de API de Google no está configurada.", "error");
-                return;
-            }
-
-            const searchUrl = site 
-                ? `https://www.google.com/search?q=${encodeURIComponent(searchTerm)}+site:${site}`
-                : `https://www.google.com/search?q=${encodeURIComponent(searchTerm)}`;
-            
-            window.open(searchUrl, '_blank');
-        }
-
-        function renderWebSearchResults(items) {
-            // Esta función ya no se usa para mostrar resultados directos,
-            // pero la dejo para mantener la estructura si en un futuro
-            // quieres volver a implementarla.
-            let resultsHTML = '';
-            DOM.webSearchResultsContainer.innerHTML = `<div class="p-6">${resultsHTML}</div>`;
         }
         
-        // --- Funcionalidad de IA de "Sugerir" y "Mejorar" (deshabilitada) ---
-        async function improveContentWithAI() {
+        async function searchWeb(searchTerm) {
+            if (!searchTerm) {
+                showToast("Introduce un término de búsqueda para buscar en la red.", "error");
+                return;
+            }
+            if (!GOOGLE_API_KEY || !SEARCH_ENGINE_ID) {
+                showToast("Error: La clave de API o el ID del motor de búsqueda de Google no están configurados.", "error");
+                return;
+            }
+
+            DOM.webSearchResultsContainer.innerHTML = `<div class="search-results-container"><i class="fas fa-spinner fa-spin fa-3x text-blue-500"></i><p class="mt-2 text-gray-600">Buscando en la web...</p></div>`;
+            
+            // Lógica para priorizar búsquedas en sitios específicos
+            const sites = "copytechnet.com | printcopy.info";
+            const url = `https://www.googleapis.com/customsearch/v1?key=${GOOGLE_API_KEY}&cx=${SEARCH_ENGINE_ID}&q=${encodeURIComponent(searchTerm)}&siteSearch=${sites}`;
+            
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                renderWebSearchResults(data.items);
+            } catch (error) {
+                console.error("Error al buscar en la web:", error);
+                DOM.webSearchResultsContainer.innerHTML = `<div class="search-results-container"><p class="text-red-500">Error al realizar la búsqueda en la web. Revisa la consola para más detalles.</p></div>`;
+            }
+        }
+        
+        function renderWebSearchResults(items) {
+            let resultsHTML = '';
+            if (items && items.length > 0) {
+                resultsHTML = items.map(item => `
+                    <div class="search-result-item">
+                        <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="text-xl font-bold text-blue-700 hover:underline">${item.title}</a>
+                        <p class="text-sm text-gray-600 mt-1">${item.snippet}</p>
+                        <span class="text-xs text-green-700">${item.displayLink}</span>
+                    </div>
+                `).join('');
+            } else {
+                resultsHTML = `<div class="search-results-container"><p class="text-gray-500">No se encontraron resultados en la web.</p></div>`;
+            }
+            DOM.webSearchResultsContainer.innerHTML = `<div class="p-6">${resultsHTML}</div>`;
+        }
+
+        // Funciones de IA eliminadas del código, solo para evitar errores.
+        function improveContentWithAI() {
             showToast("Funcionalidad IA no implementada en esta versión.", "error");
         }
 
-        async function suggestTagsWithAI() {
+        function suggestTagsWithAI() {
             showToast("Funcionalidad IA no implementada en esta versión.", "error");
         }
 
@@ -474,8 +483,7 @@
                     <div class="relative w-full shadow-lg rounded-full flex">
                         <input type="text" id="mainSearchInput" placeholder="Busca en tus notas o en la red..." class="flex-grow pl-6 pr-4 py-4 border border-gray-200 rounded-l-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                         <button id="mainSearchButton" class="px-6 bg-gray-800 text-white hover:bg-gray-900 transition-colors">Buscar</button>
-                        <button id="searchWebButton" class="px-6 bg-blue-600 text-white hover:bg-blue-700 transition-colors">Copytech</button>
-                        <button id="searchGoogleButton" class="px-6 bg-yellow-500 text-white rounded-r-full hover:bg-yellow-600 transition-colors">Google</button>
+                        <button id="searchWebButton" class="px-6 bg-blue-600 text-white rounded-r-full hover:bg-blue-700 transition-colors">Web</button>
                     </div>
                 </div>
             </div>
@@ -507,13 +515,13 @@
                     <div>
                         <div class="flex justify-between items-center mb-1">
                             <label for="noteContent" class="block text-sm font-medium text-gray-700">Contenido</label>
-                            </div>
+                        </div>
                         <textarea id="noteContent" rows="8" class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500"></textarea>
                     </div>
                     <div>
                         <div class="flex justify-between items-center mb-1">
                             <label for="noteTags" class="block text-sm font-medium text-gray-700">Etiquetas (separadas por comas)</label>
-                            </div>
+                        </div>
                         <input type="text" id="noteTags" placeholder="ej: konica, error-d072, nvram" class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500">
                     </div>
                     <div>
