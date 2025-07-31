@@ -121,7 +121,6 @@
                 suggestTagsButton: document.getElementById('suggestTagsButton'),
                 searchWebButton: document.getElementById('searchWebButton'),
                 webSearchResultsContainer: document.getElementById('web-search-results'),
-                // Nuevos elementos para el menú móvil
                 menuToggleBtn: document.getElementById('menuToggleBtn'),
                 mobileMenu: document.getElementById('mobileMenu'),
                 closeMobileMenuBtn: document.getElementById('closeMobileMenuBtn'),
@@ -141,12 +140,9 @@
             DOM.noteAttachmentInput.addEventListener('change', handleFileSelect);
             DOM.removeFileButton.addEventListener('click', removeSelectedFile);
             DOM.cancelButton.addEventListener('click', () => toggleModal('confirmationModal', false));
-            // Event Listeners para la funcionalidad de IA
             DOM.improveContentButton.addEventListener('click', improveContentWithAI);
             DOM.suggestTagsButton.addEventListener('click', suggestTagsWithAI);
-            // Event Listener para la búsqueda en la red
             DOM.searchWebButton.addEventListener('click', () => performSearch(DOM.mainSearchInput.value, 'web'));
-            // Event listeners para el menú móvil
             if (DOM.menuToggleBtn) DOM.menuToggleBtn.addEventListener('click', () => DOM.mobileMenu.classList.add('active'));
             if (DOM.closeMobileMenuBtn) DOM.closeMobileMenuBtn.addEventListener('click', () => DOM.mobileMenu.classList.remove('active'));
         }
@@ -179,7 +175,7 @@
 
             DOM.webSearchResultsContainer.innerHTML = `<div class="search-results-container"><i class="fas fa-spinner fa-spin fa-3x text-blue-500"></i><p class="mt-2 text-gray-600">Buscando en la web...</p></div>`;
             
-            const searchUrl = `https://www.googleapis.com/customsearch/v1?key=${GOOGLE_API_KEY}&cx=${SEARCH_ENGINE_ID}&q=${encodeURIComponent(searchTerm)}&siteSearch=${SEARCH_SITE}`;
+            const url = `https://www.googleapis.com/customsearch/v1?key=${GOOGLE_API_KEY}&cx=${SEARCH_ENGINE_ID}&q=${encodeURIComponent(searchTerm)}&siteSearch=${SEARCH_SITE}`;
             
             try {
                 const response = await fetch(url);
@@ -189,7 +185,6 @@
                 console.error("Error al buscar en la web:", error);
                 DOM.webSearchResultsContainer.innerHTML = `<div class="search-results-container"><p class="text-red-500">Error al realizar la búsqueda en la web. Revisa la consola para más detalles.</p></div>`;
             }
-
         }
 
         function renderWebSearchResults(items) {
