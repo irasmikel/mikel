@@ -115,10 +115,9 @@
                 confirmButton: document.getElementById('confirmButton'),
                 cancelButton: document.getElementById('cancelButton'),
                 toastContainer: document.getElementById('toast-container'),
-                improveContentButton: document.getElementById('improveContentButton'),
-                suggestTagsButton: document.getElementById('suggestTagsButton'),
+                // Eliminados los botones de IA del DOM
                 searchWebButton: document.getElementById('searchWebButton'),
-                searchGoogleButton: document.getElementById('searchGoogleButton'), // Nuevo botón para Google
+                searchGoogleButton: document.getElementById('searchGoogleButton'),
                 webSearchResultsContainer: document.getElementById('web-search-results'),
                 menuToggleBtn: document.getElementById('menuToggleBtn'),
                 mobileMenu: document.getElementById('mobileMenu'),
@@ -139,10 +138,7 @@
             DOM.noteAttachmentInput.addEventListener('change', handleFileSelect);
             DOM.removeFileButton.addEventListener('click', removeSelectedFile);
             DOM.cancelButton.addEventListener('click', () => toggleModal('confirmationModal', false));
-            // Funcionalidad de IA deshabilitada
-            DOM.improveContentButton.addEventListener('click', () => showToast("Funcionalidad IA no implementada en esta versión.", "error"));
-            DOM.suggestTagsButton.addEventListener('click', () => showToast("Funcionalidad IA no implementada en esta versión.", "error"));
-            // Event Listener para la búsqueda en la red
+            // Event Listeners para los botones de búsqueda web
             DOM.searchWebButton.addEventListener('click', () => performSearch(DOM.mainSearchInput.value, 'copytech'));
             DOM.searchGoogleButton.addEventListener('click', () => performSearch(DOM.mainSearchInput.value, 'google'));
             if (DOM.menuToggleBtn) DOM.menuToggleBtn.addEventListener('click', () => DOM.mobileMenu.classList.add('active'));
@@ -161,78 +157,39 @@
                 showView('items');
             } else if (type === 'copytech') {
                 searchWeb(searchTerm, SEARCH_SITE);
+                showView('web-search');
             } else if (type === 'google') {
                 searchWeb(searchTerm, null);
+                showView('web-search');
             }
         }
 
         async function searchWeb(searchTerm, site) {
             if (!searchTerm) {
-                showToast("Introduce un término de búsqueda para buscar en la web.", "error");
+                showToast("Introduce un término de búsqueda.", "error");
                 return;
             }
-            if (!GOOGLE_API_KEY || !SEARCH_ENGINE_ID) {
-                showToast("Error: La clave de API o el ID del motor de búsqueda de Google no están configurados.", "error");
+            if (!GOOGLE_API_KEY) {
+                showToast("Error: La clave de API de Google no está configurada.", "error");
                 return;
             }
 
-            DOM.webSearchResultsContainer.innerHTML = `<div class="search-results-container"><i class="fas fa-spinner fa-spin fa-3x text-blue-500"></i><p class="mt-2 text-gray-600">Buscando en la web...</p></div>`;
+            const searchUrl = site 
+                ? `https://www.google.com/search?q=${encodeURIComponent(searchTerm)}+site:${site}`
+                : `https://www.google.com/search?q=${encodeURIComponent(searchTerm)}`;
             
-            const url = `https://www.googleapis.com/customsearch/v1?key=${GOOGLE_API_KEY}&cx=${SEARCH_ENGINE_ID}&q=${encodeURIComponent(searchTerm)}${site ? `&siteSearch=${site}` : ''}`;
-            
-            try {
-                const response = await fetch(url);
-                const data = await response.json();
-                renderWebSearchResults(data.items);
-            } catch (error) {
-                console.error("Error al buscar en la web:", error);
-                DOM.webSearchResultsContainer.innerHTML = `<div class="search-results-container"><p class="text-red-500">Error al realizar la búsqueda en la web. Revisa la consola para más detalles.</p></div>`;
-            }
+            window.open(searchUrl, '_blank');
         }
 
         function renderWebSearchResults(items) {
+            // Esta función ya no se usa para mostrar resultados directos,
+            // pero la dejo para mantener la estructura si en un futuro
+            // quieres volver a implementarla.
             let resultsHTML = '';
-            if (items && items.length > 0) {
-                resultsHTML = items.map(item => `
-                    <div class="search-result-item">
-                        <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="text-xl font-bold text-blue-700 hover:underline">${item.title}</a>
-                        <p class="text-sm text-gray-600 mt-1">${item.snippet}</p>
-                        <span class="text-xs text-green-700">${item.displayLink}</span>
-                    </div>
-                `).join('');
-            } else {
-                resultsHTML = `<div class="search-results-container"><p class="text-gray-500">No se encontraron resultados en la web.</p></div>`;
-            }
             DOM.webSearchResultsContainer.innerHTML = `<div class="p-6">${resultsHTML}</div>`;
         }
-
-        async function callAI(prompt, button) {
-            let originalText = '';
-            if (button) {
-                originalText = button.innerHTML;
-                button.disabled = true;
-                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-            }
-            try {
-                const apiKey = "AIzaSyDn1rKLZsifC5H9KY1Wq5L3ZeVYEMCeF3w";
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-                const payload = { contents: [{ parts: [{ text: prompt }] }] };
-                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                if (!response.ok) throw new Error(`API Error: ${response.statusText}`);
-                const result = await response.json();
-                return result.candidates[0].content.parts[0].text;
-            } catch (error) {
-                console.error("Error calling AI API:", error);
-                showToast("Error de comunicación con la IA.", "error");
-                return null;
-            } finally {
-                if (button) {
-                    button.disabled = false;
-                    button.innerHTML = originalText;
-                }
-            }
-        }
-
+        
+        // --- Funcionalidad de IA de "Sugerir" y "Mejorar" (deshabilitada) ---
         async function improveContentWithAI() {
             showToast("Funcionalidad IA no implementada en esta versión.", "error");
         }
@@ -550,15 +507,13 @@
                     <div>
                         <div class="flex justify-between items-center mb-1">
                             <label for="noteContent" class="block text-sm font-medium text-gray-700">Contenido</label>
-                            <button type="button" id="improveContentButton" class="text-xs text-blue-600 hover:underline font-semibold flex items-center gap-1"><i class="fas fa-wand-magic-sparkles"></i>Mejorar con IA</button>
-                        </div>
+                            </div>
                         <textarea id="noteContent" rows="8" class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500"></textarea>
                     </div>
                     <div>
                         <div class="flex justify-between items-center mb-1">
                             <label for="noteTags" class="block text-sm font-medium text-gray-700">Etiquetas (separadas por comas)</label>
-                            <button type="button" id="suggestTagsButton" class="text-xs text-blue-600 hover:underline font-semibold flex items-center gap-1"><i class="fas fa-wand-magic-sparkles"></i>Sugerir</button>
-                        </div>
+                            </div>
                         <input type="text" id="noteTags" placeholder="ej: konica, error-d072, nvram" class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500">
                     </div>
                     <div>
