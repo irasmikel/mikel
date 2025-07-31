@@ -1,121 +1,106 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mikel - MFC App</title>
+  <title>Mikel App Mejorada</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-storage-compat.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 </head>
-<body class="bg-white text-gray-800 font-sans">
-
-  <!-- Header -->
-  <div class="flex justify-between items-center p-4 border-b">
-    <h1 class="text-2xl font-bold flex items-center">
-      <span class="mr-2">📄</span> Mikel
-    </h1>
+<body class="bg-gray-100 text-gray-800 font-sans">
+  <header class="bg-white shadow p-4 flex justify-between items-center">
+    <h1 class="text-2xl font-bold">📄 Mikel App</h1>
     <div class="space-x-2">
-      <button onclick="mostrarDescargas()" class="bg-white border rounded px-3 py-2 hover:bg-gray-100">⬇️ MFC</button>
+      <button onclick="mostrarDescargas()" class="bg-white border rounded px-3 py-2 hover:bg-gray-100">⬇️ Recursos</button>
       <button onclick="mostrarNotas()" class="bg-white border rounded px-3 py-2 hover:bg-gray-100">📋 Ver Todo</button>
-      <button onclick="formularioNota()" class="bg-blue-900 text-white px-4 py-2 rounded hover:bg-blue-700">➕ Añadir Item</button>
+      <button onclick="formularioNota()" class="bg-blue-800 text-white px-4 py-2 rounded hover:bg-blue-600">➕ Añadir</button>
     </div>
-  </div>
+  </header>
 
-  <!-- Buscador -->
-  <div class="flex justify-center my-10">
-    <input id="busqueda" type="text" placeholder="Pregúntame lo que sea sobre tus items..." class="w-1/2 p-3 border rounded-l shadow" />
-    <button onclick="buscarNotas()" class="bg-blue-900 text-white px-6 rounded-r hover:bg-blue-700">Buscar</button>
-  </div>
-
-  <!-- Resultados / Formulario -->
-  <div id="contenido" class="max-w-3xl mx-auto px-4 space-y-6"></div>
+  <main class="p-6 max-w-4xl mx-auto">
+    <div class="mb-6">
+      <input id="busqueda" type="text" placeholder="Buscar entre notas..." class="w-full p-3 border rounded" />
+    </div>
+    <div id="contenido" class="space-y-6"></div>
+  </main>
 
   <script>
-    // 🔥 Configura Firebase aquí:
     const firebaseConfig = {
-  apiKey: "AIzaSyA26sad8msWrNTVByMs8umSUV_OJsqctuE",
-  authDomain: "mikelaneako.firebaseapp.com",
-  projectId: "mikelaneako",
-  storageBucket: "mikelaneako.firebasestorage.app",
-  messagingSenderId: "261413636045",
-  appId: "1:261413636045:web:717b7e87d84a345e816684"
-};
-
+      apiKey: "AIzaSyA26sad8msWrNTVByMs8umSUV_OJsqctuE",
+      authDomain: "mikelaneako.firebaseapp.com",
+      projectId: "mikelaneako",
+      storageBucket: "mikelaneako.firebasestorage.app",
+      messagingSenderId: "261413636045",
+      appId: "1:261413636045:web:717b7e87d84a345e816684"
+    };
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
+    const storage = firebase.storage();
     firebase.auth().signInAnonymously();
 
-    // Mostrar botones de descarga
     function mostrarDescargas() {
       document.getElementById("contenido").innerHTML = `
-        <h2 class="text-xl font-bold">Descargar MFC</h2>
-        <ul class="list-disc pl-6 mt-4">
+        <h2 class="text-xl font-bold mb-2">Descargas</h2>
+        <ul class="list-disc pl-6">
           <li><a href="MFC.msi" download class="text-blue-700 underline">Descargar MFC.msi</a></li>
           <li><a href="mfc.exe" download class="text-blue-700 underline">Descargar mfc.exe</a></li>
-          <li><a href="https://mfc.maquelsa.com/mfc3/access.php" class="text-blue-700 underline" target="_blank">Acceso Principal</a></li>
-          <li><a href="https://mirror1.infodesain.com/nodeprint/access.php" class="text-blue-700 underline" target="_blank">Acceso Mirror</a></li>
+          <li><a href="https://mfc.maquelsa.com/mfc3/access.php" class="text-green-700 underline" target="_blank">Acceso Web 1</a></li>
+          <li><a href="https://mirror1.infodesain.com/nodeprint/access.php" class="text-green-700 underline" target="_blank">Acceso Web 2</a></li>
         </ul>
       `;
     }
 
-    // Mostrar formulario para nueva nota
     function formularioNota() {
       document.getElementById("contenido").innerHTML = `
-        <h2 class="text-xl font-bold mb-4">Añadir Nota</h2>
-        <input id="titulo" placeholder="Título" class="w-full p-2 mb-2 border rounded" />
-        <textarea id="descripcion" placeholder="Descripción..." class="w-full p-2 mb-2 border rounded" rows="4"></textarea>
-        <input id="tags" placeholder="Etiquetas (separadas por comas)" class="w-full p-2 mb-4 border rounded" />
-        <button onclick="guardarNota()" class="bg-blue-900 text-white px-4 py-2 rounded hover:bg-blue-700">Guardar</button>
+        <h2 class="text-xl font-bold mb-2">Nueva Nota</h2>
+        <input id="titulo" placeholder="Título" class="w-full p-2 border rounded mb-2" />
+        <textarea id="descripcion" placeholder="Contenido..." class="w-full p-2 border rounded mb-2"></textarea>
+        <input id="tags" placeholder="Etiquetas (coma separadas)" class="w-full p-2 border rounded mb-4" />
+        <input type="file" id="archivo" class="mb-4" />
+        <button onclick="guardarNota()" class="bg-blue-700 text-white px-4 py-2 rounded">Guardar</button>
       `;
     }
 
-    // Guardar nota en Firebase
     async function guardarNota() {
       const titulo = document.getElementById("titulo").value;
       const descripcion = document.getElementById("descripcion").value;
       const tags = document.getElementById("tags").value.split(',').map(t => t.trim().toLowerCase());
+      const file = document.getElementById("archivo").files[0];
 
-      if (!titulo || !descripcion) return alert("Rellena todos los campos.");
+      if (!titulo || !descripcion) return alert("Completa todos los campos");
 
-      await db.collection("notas").add({ titulo, descripcion, tags, timestamp: new Date() });
-      alert("¡Nota guardada!");
+      let fileURL = null;
+      if (file) {
+        const storageRef = storage.ref("adjuntos/" + Date.now() + "-" + file.name);
+        await storageRef.put(file);
+        fileURL = await storageRef.getDownloadURL();
+      }
+
+      await db.collection("notas").add({ titulo, descripcion, tags, fileURL, fecha: new Date() });
+      alert("Nota guardada");
       mostrarNotas();
     }
 
-    // Mostrar todas las notas
     async function mostrarNotas() {
-      const snapshot = await db.collection("notas").orderBy("timestamp", "desc").get();
+      const snapshot = await db.collection("notas").orderBy("fecha", "desc").get();
       const html = snapshot.docs.map(doc => {
-        const nota = doc.data();
+        const d = doc.data();
         return `
-          <div class="p-4 border rounded shadow">
-            <h3 class="text-lg font-semibold">${nota.titulo}</h3>
-            <p>${nota.descripcion}</p>
-            <div class="mt-2 text-sm text-gray-600">Etiquetas: ${nota.tags.join(", ")}</div>
+          <div class="bg-white p-4 rounded shadow">
+            <h3 class="text-lg font-bold">${d.titulo}</h3>
+            <p>${d.descripcion}</p>
+            <p class="text-sm text-gray-600 mt-2">Etiquetas: ${d.tags.join(", ")}</p>
+            ${d.fileURL ? `<a href="${d.fileURL}" target="_blank" class="text-blue-600 underline block mt-2">Ver adjunto</a>` : ""}
           </div>
         `;
       }).join("");
-      document.getElementById("contenido").innerHTML = html || "<p>No hay notas todavía.</p>";
-    }
-
-    // Buscar notas
-    async function buscarNotas() {
-      const query = document.getElementById("busqueda").value.toLowerCase();
-      const snapshot = await db.collection("notas").get();
-      const html = snapshot.docs
-        .map(doc => doc.data())
-        .filter(nota => nota.titulo.toLowerCase().includes(query) || nota.descripcion.toLowerCase().includes(query) || nota.tags.includes(query))
-        .map(nota => `
-          <div class="p-4 border rounded shadow">
-            <h3 class="text-lg font-semibold">${nota.titulo}</h3>
-            <p>${nota.descripcion}</p>
-            <div class="mt-2 text-sm text-gray-600">Etiquetas: ${nota.tags.join(", ")}</div>
-          </div>
-        `).join("");
-      document.getElementById("contenido").innerHTML = html || "<p>No se encontraron resultados.</p>";
+      document.getElementById("contenido").innerHTML = html || "<p>No hay notas aún.</p>";
     }
   </script>
 </body>
