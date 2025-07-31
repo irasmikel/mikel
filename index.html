@@ -23,18 +23,18 @@
         .toast.show { opacity: 1; transform: translateX(0); }
         .toast.success { background-color: #d1fae5; color: #065f46; }
         .toast.error { background-color: #fee2e2; color: #991b1b; }
+        .search-results-container { min-height: 200px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .search-results-list { width: 100%; max-width: 800px; }
+        .search-result-item { background-color: white; border: 1px solid #e2e8f0; padding: 16px; margin-bottom: 16px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
     </style>
 </head>
 <body class="antialiased text-gray-800">
 
-    <script>
-        // Utiliza las librerías compat de Firebase para mantener la sintaxis original
-    </script>
     <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-storage-compat.js"></script>
-
+    
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyA26sad8msWrNTVByMs8umSUV_OJsqctuE",
@@ -44,22 +44,22 @@
             messagingSenderId: "261413636045",
             appId: "1:261413636045:web:717b7e87d84a345e816684"
         };
-
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const storage = firebase.storage();
         const auth = firebase.auth();
-        
         let allNotes = [];
         let DOM = {};
+
+        // API de Google Custom Search - Clave y CSE ID actualizados
+        const GOOGLE_API_KEY = "AIzaSyDbwINNjAmw9-eL5dygCvuSmbJxdZMbwJg";
+        const SEARCH_ENGINE_ID = "f6867d96a7dce4c9c";
+        const SEARCH_SITE = "copytechnet.com";
 
         window.onload = () => {
             initializeDOMElements();
             setupEventListeners();
-            
-            // Direct anonymous sign-in on page load, no password needed
             auth.signInAnonymously().then(() => {
-                console.log("Signed in anonymously.");
                 DOM.appHeader.classList.remove('hidden');
                 DOM.appMain.classList.remove('hidden');
                 showView('search');
@@ -67,7 +67,6 @@
             }).catch((error) => {
                 console.error("Error al iniciar sesión anónimamente:", error);
                 showToast("Error de autenticación. La aplicación puede no funcionar correctamente.", "error");
-                // Todavía mostrar el encabezado/aplicación principal incluso si falla el inicio de sesión anónimo
                 DOM.appHeader.classList.remove('hidden');
                 DOM.appMain.classList.remove('hidden');
                 showView('search');
@@ -112,7 +111,8 @@
                 toastContainer: document.getElementById('toast-container'),
                 improveContentButton: document.getElementById('improveContentButton'),
                 suggestTagsButton: document.getElementById('suggestTagsButton'),
-                // signOutButton: document.getElementById('signOutButton'), // Eliminado
+                searchWebButton: document.getElementById('searchWebButton'),
+                webSearchResultsContainer: document.getElementById('web-search-results'),
             };
         }
 
@@ -120,8 +120,8 @@
             DOM.logoButton.addEventListener('click', () => showView('search'));
             DOM.viewAllButton.addEventListener('click', () => { DOM.searchInput.value = ''; renderNotes(allNotes); showView('items'); });
             DOM.mfcButton.addEventListener('click', () => toggleModal('mfcModal', true));
-            DOM.mainSearchButton.addEventListener('click', performSearch);
-            DOM.mainSearchInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') performSearch(); });
+            DOM.mainSearchButton.addEventListener('click', () => performSearch(DOM.mainSearchInput.value, 'db'));
+            DOM.mainSearchInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') performSearch(DOM.mainSearchInput.value, 'db'); });
             DOM.searchInput.addEventListener('input', () => filterNotes(DOM.searchInput.value));
             DOM.addItemButtonHeader.addEventListener('click', () => openAddModal());
             document.querySelectorAll('.modal-close').forEach(btn => btn.addEventListener('click', () => toggleModal(btn.dataset.modal, false)));
@@ -129,20 +129,145 @@
             DOM.noteAttachmentInput.addEventListener('change', handleFileSelect);
             DOM.removeFileButton.addEventListener('click', removeSelectedFile);
             DOM.cancelButton.addEventListener('click', () => toggleModal('confirmationModal', false));
-            // Estos botones son solo para estética, ya que el index.html original no tiene integración con IA
-            DOM.improveContentButton.addEventListener('click', () => showToast("Funcionalidad IA no implementada en esta versión.", "error"));
-            DOM.suggestTagsButton.addEventListener('click', () => showToast("Funcionalidad IA no implementada en esta versión.", "error"));
-            // Eliminado el event listener para signOutButton
+            // Event Listeners para la funcionalidad de IA
+            DOM.improveContentButton.addEventListener('click', improveContentWithAI);
+            DOM.suggestTagsButton.addEventListener('click', suggestTagsWithAI);
+            // Event Listener para la búsqueda en la red
+            DOM.searchWebButton.addEventListener('click', () => performSearch(DOM.mainSearchInput.value, 'web'));
         }
 
         function showView(viewName) {
             DOM.mainSearchView.classList.toggle('hidden', viewName !== 'search');
             DOM.allItemsView.classList.toggle('hidden', viewName !== 'items');
+            DOM.webSearchResultsContainer.classList.toggle('hidden', viewName !== 'web-search');
         }
 
-        function performSearch() {
-            filterNotes(DOM.mainSearchInput.value);
-            showView('items');
+        function performSearch(searchTerm, type) {
+            if (type === 'db') {
+                filterNotes(searchTerm);
+                showView('items');
+            } else if (type === 'web') {
+                searchWeb(searchTerm);
+                showView('web-search');
+            }
+        }
+
+        // --- Funcionalidad de Búsqueda en la Red ---
+        async function searchWeb(searchTerm) {
+            if (!searchTerm) {
+                showToast("Introduce un término de búsqueda para buscar en la web.", "error");
+                return;
+            }
+            if (!GOOGLE_API_KEY || !SEARCH_ENGINE_ID) {
+                showToast("Error: La clave de API o el ID del motor de búsqueda de Google no están configurados.", "error");
+                return;
+            }
+
+            DOM.webSearchResultsContainer.innerHTML = `<div class="search-results-container"><i class="fas fa-spinner fa-spin fa-3x text-blue-500"></i><p class="mt-2 text-gray-600">Buscando en la web...</p></div>`;
+            const url = `https://www.googleapis.com/customsearch/v1?key=${GOOGLE_API_KEY}&cx=${SEARCH_ENGINE_ID}&q=${encodeURIComponent(searchTerm)}&siteSearch=${SEARCH_SITE}`;
+            
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                renderWebSearchResults(data.items);
+            } catch (error) {
+                console.error("Error al buscar en la web:", error);
+                DOM.webSearchResultsContainer.innerHTML = `<div class="search-results-container"><p class="text-red-500">Error al realizar la búsqueda en la web. Revisa la consola para más detalles.</p></div>`;
+            }
+        }
+
+        function renderWebSearchResults(items) {
+            let resultsHTML = '';
+            if (items && items.length > 0) {
+                resultsHTML = items.map(item => `
+                    <div class="search-result-item">
+                        <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="text-xl font-bold text-blue-700 hover:underline">${item.title}</a>
+                        <p class="text-sm text-gray-600 mt-1">${item.snippet}</p>
+                        <span class="text-xs text-green-700">${item.displayLink}</span>
+                    </div>
+                `).join('');
+            } else {
+                resultsHTML = `<div class="search-results-container"><p class="text-gray-500">No se encontraron resultados en la web.</p></div>`;
+            }
+            DOM.webSearchResultsContainer.innerHTML = `<div class="p-6">${resultsHTML}</div>`;
+        }
+        
+        // --- Funcionalidad de IA del INDEX-ONDO-3107.html ---
+        async function callAI(prompt, button) {
+            const originalText = button.innerHTML;
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            try {
+                // Clave de API de Gemini
+                const apiKey = "TU_CLAVE_DE_API_DE_GEMINI";
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+                const payload = { contents: [{ parts: [{ text: prompt }] }] };
+                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                if (!response.ok) throw new Error(`API Error: ${response.statusText}`);
+                const result = await response.json();
+                return result.candidates[0].content.parts[0].text;
+            } catch (error) {
+                console.error("Error calling AI API:", error);
+                showToast("Error de comunicación con la IA.", "error");
+                return null;
+            } finally {
+                button.disabled = false;
+                button.innerHTML = originalText;
+            }
+        }
+
+        async function improveContentWithAI() {
+            const rawContent = DOM.noteContentInput.value.trim();
+            if (!rawContent) {
+                showToast("Escribe algo en el contenido primero.", "error");
+                return;
+            }
+            const prompt = `
+                **Rol:** Eres un asistente experto en la creación de documentación técnica para un técnico de campo.
+                **Tarea:** Toma las siguientes notas en bruto y transfórmalas en una ficha de solución clara y profesional.
+                **Formato de Salida Obligatorio (Markdown):**
+                ### Causa Probable
+                (Describe el origen del problema)
+                ### Pasos para la Solución
+                (Usa una lista numerada para los pasos)
+                ### Recomendación Adicional
+                (Ofrece un consejo final si la solución no funciona)
+                
+                **Notas en bruto del técnico:**
+                "${rawContent}"
+            `;
+            const improvedContent = await callAI(prompt, DOM.improveContentButton);
+            if (improvedContent) {
+                DOM.noteContentInput.value = improvedContent;
+                showToast("Contenido mejorado con IA.", "success");
+            }
+        }
+
+        async function suggestTagsWithAI() {
+            const title = DOM.noteTitleInput.value.trim();
+            const content = DOM.noteContentInput.value.trim();
+            if (!title && !content) {
+                showToast("Escribe un título o contenido para sugerir etiquetas.", "error");
+                return;
+            }
+            const prompt = `
+                **Rol:** Eres un experto en catalogación de documentación técnica.
+                **Tarea:** Lee el siguiente título y contenido sobre un problema técnico y genera una lista de 3 a 5 etiquetas clave.
+                **Reglas para las etiquetas:**
+                - Deben ser cortas y relevantes.
+                - En minúsculas.
+                - Separadas por comas.
+                - Usa guiones en lugar de espacios (ej: 'error-fusor').
+                - Incluye la marca y el código de error si se mencionan.
+                
+                **Título:** ${title}
+                **Contenido:** ${content}
+            `;
+            const suggestedTags = await callAI(prompt, DOM.suggestTagsButton);
+            if (suggestedTags) {
+                DOM.noteTagsInput.value = suggestedTags;
+                showToast("Etiquetas sugeridas.", "success");
+            }
         }
 
         function toggleModal(modalId, show) {
@@ -316,8 +441,8 @@
         // --- RENDERING & UI ---
         function renderNotes(notes) {
             DOM.notesContainer.innerHTML = '';
-            DOM.noResultsMessage.classList.toggle('hidden', notes.length > 0 || allNotes.length === 0);
-            DOM.noNotesMessage.classList.toggle('hidden', allNotes.length === 0 && notes.length === 0);
+            DOM.noResultsMessage.classList.toggle('hidden', notes.length > 0 || DOM.searchInput.value === '');
+            DOM.noNotesMessage.classList.toggle('hidden', allNotes.length > 0);
             notes.forEach(note => {
                 const noteElement = document.createElement('div');
                 noteElement.className = 'note-card bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex flex-col';
@@ -376,15 +501,15 @@
                 </div>
                 <div class="flex items-center gap-3">
                     <button id="viewAllButton" class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
-                     <i class="fa-solid fa-list"></i> Ver Todo
+                        <i class="fa-solid fa-list"></i> Ver Todo
                     </button>
-                    <button id="mfcButton" class="hidden sm:flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                    <button id="mfcButton" class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
                         <i class="fa-solid fa-download"></i> Recursos
                     </button>
                     <button id="addItemButtonHeader" class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-gray-800 rounded-md hover:bg-gray-900">
                         <i class="fa-solid fa-plus"></i> Añadir Item
                     </button>
-                    </div>
+                </div>
             </div>
         </div>
     </header>
@@ -396,9 +521,10 @@
                 <div class="text-center w-full max-w-2xl">
                     <div class="flex justify-center items-center gap-3 mb-6"><span class="bg-white border-2 border-gray-200 rounded-2xl w-16 h-16 flex items-center justify-center text-2xl"><i class="fa-solid fa-plus"></i></span></div>
                     <h1 class="text-5xl font-bold text-gray-800 mb-8">Mikel</h1>
-                    <div class="relative w-full shadow-lg rounded-full">
-                        <input type="text" id="mainSearchInput" placeholder="Busca en tu base de conocimiento..." class="w-full pl-6 pr-32 py-4 border border-gray-200 rounded-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        <button id="mainSearchButton" class="absolute inset-y-0 right-2 my-2 px-6 bg-gray-800 text-white rounded-full hover:bg-gray-900">Buscar</button>
+                    <div class="relative w-full shadow-lg rounded-full flex">
+                        <input type="text" id="mainSearchInput" placeholder="Busca en tus notas o en la red..." class="flex-grow pl-6 pr-4 py-4 border border-gray-200 rounded-l-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <button id="mainSearchButton" class="px-6 bg-gray-800 text-white hover:bg-gray-900 transition-colors">Buscar</button>
+                        <button id="searchWebButton" class="px-6 bg-blue-600 text-white rounded-r-full hover:bg-blue-700 transition-colors">Web</button>
                     </div>
                 </div>
             </div>
@@ -416,6 +542,8 @@
             <div id="no-results-message" class="text-center py-10 bg-white rounded-lg shadow-sm hidden"><i class="fas fa-search-minus fa-3x text-gray-400"></i><p class="mt-4 text-xl font-semibold text-gray-700">No se encontraron resultados.</p><p class="text-gray-500">Prueba con otros términos de búsqueda.</p></div>
             <div id="notes-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </div>
+        <div id="web-search-results" class="p-4 hidden">
+            </div>
     </main>
 
     <div id="addNoteModal" class="modal fixed inset-0 bg-gray-900 bg-opacity-75 items-center justify-center p-4 z-50">
