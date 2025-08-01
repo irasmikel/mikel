@@ -418,7 +418,10 @@
                     await db.collection("notas").doc(noteId).update(noteData);
                     showToast("Item actualizado.", "success");
                 } else {
-                    await db.collection("notas").add(noteData);
+                    console.log("Enviando a Firebase...");
+await db.collection("notas").add(noteData).catch(err => {
+  console.error("Fallo al guardar en Firebase:", err);
+});
                     showToast("Item añadido.", "success");
                 }
                 toggleModal('addNoteModal', false);
