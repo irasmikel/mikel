@@ -18,9 +18,9 @@
 <!-- Botón y menú hamburguesa solo visible en móviles -->
 <!-- Botón cerrar sesión solo en escritorio -->
 <div class="hidden md:block fixed top-4 right-4 z-50">
-<button class="text-gray-700 bg-white p-2 rounded shadow-md hover:bg-gray-100" onclick="logoutApp()">
-<i class="fas fa-sign-out-alt"></i> Cerrar sesión
-  </button>
+<button class="text-white bg-gray-800 p-3 rounded-full shadow-md hover:bg-gray-900" onclick="logoutApp()" title="Cerrar sesión">
+  <i class="fas fa-sign-out-alt fa-lg"></i>
+</button>
 </div>
 
 <div class="md:hidden fixed top-4 left-4 z-50">
@@ -182,7 +182,6 @@
                 noteIdToEdit: document.getElementById('noteIdToEdit'),
                 noteTitleInput: document.getElementById('noteTitle'),
                 noteContentInput: document.getElementById('noteContent'),
-                noteTagsInput: document.getElementById('noteTags'),
                 noteAttachmentInput: document.getElementById('noteAttachment'),
                 noteAttachmentLabel: document.getElementById('noteAttachmentLabel'),
                 fileChosenContainer: document.getElementById('file-chosen-container'),
@@ -356,8 +355,7 @@
         async function saveNote() {
             const title = DOM.noteTitleInput.value.trim();
             const content = DOM.noteContentInput.value.trim();
-            const tags = DOM.noteTagsInput.value.split(',').map(tag => tag.trim()).filter(Boolean);
-            const file = DOM.noteAttachmentInput.files[0];
+                        const file = DOM.noteAttachmentInput.files[0];
             const noteId = DOM.noteIdToEdit.value;
 
             if (title === '' || content === '') {
@@ -403,7 +401,7 @@
                 const noteData = { 
                     titulo: title,
                     descripcion: content,
-                    tags: tags,
+                    
                     fileURL: fileURL,
                     filePath: filePath,
                     fileName: fileName,
@@ -455,11 +453,7 @@
             notes.forEach(note => {
                 const noteElement = document.createElement('div');
                 noteElement.className = 'note-card bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex flex-col';
-                const tagsHTML = (note.tags && note.tags.length > 0) ? `<div class="flex flex-wrap gap-2 mb-3">${note.tags.map(tag => `<span class="tag">${escapeHTML(tag)}</span>`).join('')}</div>` : '';
-                const attachmentHTML = note.fileURL ? `<a href="${note.fileURL}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-sm text-blue-600 hover:underline mt-3 pt-3 border-t border-gray-100"><i class="fas fa-paperclip"></i><span>${escapeHTML(note.fileName || 'Adjunto')}</span></a>` : '';
-                const date = note.fecha ? new Date(note.fecha.seconds * 1000).toLocaleString() : 'N/A';
-                noteElement.innerHTML = `<div class="flex-grow"><div class="flex justify-between items-start mb-2"><h3 class="text-xl font-bold text-gray-900 pr-4">${escapeHTML(note.titulo)}</h3><div class="flex items-center gap-3"><button data-id="${note.id}" class="edit-note-btn text-gray-400 hover:text-blue-500"><i class="fas fa-pencil-alt"></i></button><button data-id="${note.id}" class="delete-note-btn text-gray-400 hover:text-red-500"><i class="fas fa-trash-alt"></i></button></div></div><p class="text-gray-600 whitespace-pre-wrap mb-4">${escapeHTML(note.descripcion)}</p></div><div>${tagsHTML}${attachmentHTML}<div class="text-right text-xs text-gray-400 mt-4">${date}</div></div>`;
-                DOM.notesContainer.appendChild(noteElement);
+                const tagsHTML = "";
             });
             document.querySelectorAll('.delete-note-btn').forEach(b => b.addEventListener('click', (e) => { e.stopPropagation(); confirmDelete(e.currentTarget.dataset.id); }));
             document.querySelectorAll('.edit-note-btn').forEach(b => b.addEventListener('click', (e) => { e.stopPropagation(); const note = allNotes.find(n=>n.id===e.currentTarget.dataset.id); if(note) openEditModal(note); }));
@@ -469,7 +463,7 @@
             const term = searchTerm.toLowerCase();
             DOM.searchInput.value = term;
             DOM.mainSearchInput.value = term;
-            const filtered = allNotes.filter(n => n.titulo.toLowerCase().includes(term) || n.descripcion.toLowerCase().includes(term) || (n.tags && n.tags.some(t => t.toLowerCase().includes(term))) || (n.fileName && n.fileName.toLowerCase().includes(term)));
+            const filtered = allNotes.filter(n => n.titulo.toLowerCase().includes(term) || n.descripcion.toLowerCase().includes(term) ) || (n.fileName && n.fileName.toLowerCase().includes(term)));
             renderNotes(filtered);
         }
         
@@ -548,11 +542,11 @@
 <div class="text-center w-full max-w-2xl">
 <div class="flex justify-center items-center gap-3 mb-6"><span class="bg-white border-2 border-gray-200 rounded-2xl w-16 h-16 flex items-center justify-center text-2xl"><i class="fa-solid fa-plus"></i></span></div>
 <h1 class="text-5xl font-bold text-gray-800 mb-8">Mikel</h1>
-<div class="relative w-full shadow-lg rounded-full flex">
-<input class="flex-grow pl-6 pr-4 py-4 border border-gray-200 rounded-l-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500" id="mainSearchInput" placeholder="Busca en tus notas o en la red..." type="text"/>
-<button class="px-6 bg-gray-800 text-white hover:bg-gray-900 transition-colors" id="mainSearchButton">Buscar</button>
+<div class="relative w-full shadow-lg rounded-xl flex flex-col sm:flex-row gap-2">
+<input class="w-full sm:rounded-l-full rounded-lg px-4 py-3 border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" id="mainSearchInput" placeholder="Busca en tus notas o en la red..." type="text"/>
+<button class="w-full sm:w-auto px-6 py-3 bg-gray-800 text-white hover:bg-gray-900 transition-colors rounded-lg sm:rounded-none sm:rounded-r-none" id="mainSearchButton">Buscar</button>
 <div class="relative">
-<button class="px-6 bg-blue-600 text-white rounded-r-full hover:bg-blue-700 transition-colors h-full flex items-center gap-2" id="webSearchDropdownBtn">
+<button class="w-full sm:w-auto px-6 py-3 bg-blue-600 text-white hover:bg-blue-700 transition-colors rounded-lg sm:rounded-r-full flex items-center justify-center gap-2" id="webSearchDropdownBtn">
                                 Web <i class="fas fa-caret-down"></i>
 </button>
 <div class="dropdown-menu absolute right-0 mt-2 py-2 w-48 bg-white rounded-md shadow-xl z-20" id="webSearchDropdownMenu">
@@ -584,20 +578,9 @@
 <div class="flex justify-between items-center p-5 border-b border-gray-200"><h3 class="text-2xl font-bold text-gray-800" id="modalTitle">Añadir Nuevo Item</h3><button class="modal-close text-gray-400 hover:text-gray-600" data-modal="addNoteModal"><i class="fas fa-times fa-2x"></i></button></div>
 <form id="addNoteForm" onsubmit="return false;">
 <input id="noteIdToEdit" type="hidden"/>
-<div class="p-6 space-y-4">
+<div class="p-6 space-y-6 sm:space-y-4">
 <div><label class="block text-sm font-medium text-gray-700 mb-1" for="noteTitle">Título</label><input class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500" id="noteTitle" type="text"/></div>
-<div>
-<div class="flex justify-between items-center mb-1">
-<label class="block text-sm font-medium text-gray-700" for="noteContent">Contenido</label>
-</div>
-<textarea class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500" id="noteContent" rows="8"></textarea>
-</div>
-<div>
-<div class="flex justify-between items-center mb-1">
-<label class="block text-sm font-medium text-gray-700" for="noteTags">Etiquetas (separadas por comas)</label>
-</div>
-<input class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500" id="noteTags" placeholder="ej: konica, error-d072, nvram" type="text"/>
-</div>
+
 <div>
 <label class="block text-sm font-medium text-gray-700 mb-1">Adjunto</label>
 <input id="noteAttachment" type="file"/>
@@ -614,8 +597,8 @@
 <div class="flex justify-between items-center p-5 border-b border-gray-200"><h3 class="text-2xl font-bold text-gray-800">Recursos</h3><button class="modal-close text-gray-400 hover:text-gray-600" data-modal="mfcModal"><i class="fas fa-times fa-2x"></i></button></div>
 <div class="p-6">
 <ul class="space-y-4">
-<li><a class="flex items-center gap-3 text-blue-600 hover:text-blue-800 hover:underline" download="" href="MFC.msi"><i class="fas fa-file-archive fa-fw text-lg"></i><span class="font-medium">MFC.msi</span></a></li>
-<li><a class="flex items-center gap-3 text-blue-600 hover:text-blue-800 hover:underline" download="" href="mfc.exe"><i class="fas fa-file-code fa-fw text-lg"></i><span class="font-medium">mfc.exe</span></a></li>
+<li><a class="flex items-center gap-3 text-blue-600 hover:text-blue-800 hover:underline" download="" href="https://firebasestorage.googleapis.com/v0/b/iamaquelsa.firebasestorage.app/o/mfc%2FMFC.msi?alt=media&token=119754ea-62a4-4ef1-b18f-872f4912e040"><i class="fas fa-file-archive fa-fw text-lg"></i><span class="font-medium">MFC.msi</span></a></li>
+<li><a class="flex items-center gap-3 text-blue-600 hover:text-blue-800 hover:underline" download="" href="https://firebasestorage.googleapis.com/v0/b/iamaquelsa.firebasestorage.app/o/mfc%2Fmfc.exe?alt=media&token=dd7f06f2-a1d8-46e3-838f-d57a7eb646b6"><i class="fas fa-file-code fa-fw text-lg"></i><span class="font-medium">mfc.exe</span></a></li>
 <li><a class="flex items-center gap-3 text-green-600 hover:text-green-800 hover:underline" href="https://mfc.maquelsa.com/mfc3/access.php" rel="noopener noreferrer" target="_blank"><i class="fas fa-external-link-alt fa-fw text-lg"></i><span class="font-medium">Acceso Web 1 (Maquelsa)</span></a></li>
 <li><a class="flex items-center gap-3 text-green-600 hover:text-green-800 hover:underline" href="https://mirror1.infodesain.com/nodeprint/access.php" rel="noopener noreferrer" target="_blank"><i class="fas fa-external-link-alt fa-fw text-lg"></i><span class="font-medium">Acceso Web 2 (Mirror)</span></a></li>
 </ul>
