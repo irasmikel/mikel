@@ -404,13 +404,14 @@
                     fileName = null;
                 }
 
-                const noteData = { 
-                    titulo: title,
-                    descripcion: content, fileURL: fileURL,
-                    filePath: filePath,
-                    fileName: fileName,
-                    fecha: firebase.firestore.Timestamp.fromDate(new Date())
-                };
+                const noteData = {
+    titulo: title,
+    descripcion: content,
+    fileURL: fileURL,
+    filePath: filePath,
+    fileName: fileName,
+    fecha: firebase.firestore.Timestamp.fromDate(new Date())
+};
 
                 if (noteId) {
                     await db.collection("notas").doc(noteId).update(noteData);
