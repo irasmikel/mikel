@@ -466,7 +466,11 @@
             const term = searchTerm.toLowerCase();
             DOM.searchInput.value = term;
             DOM.mainSearchInput.value = term;
-            const filtered = allNotes.filter(n => n.titulo.toLowerCase().includes(term) || n.descripcion.toLowerCase().includes(term) ) || (n.fileName && n.fileName.toLowerCase().includes(term)));
+            const filtered = allNotes.filter(n =>
+  n.titulo.toLowerCase().includes(term) ||
+  n.descripcion.toLowerCase().includes(term) ||
+  (n.fileName && n.fileName.toLowerCase().includes(term))
+);
             renderNotes(filtered);
         }
         
