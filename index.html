@@ -31,7 +31,7 @@
 </div>
 <div class="hidden fixed top-16 left-4 bg-white rounded-lg shadow-lg p-4 z-40 space-y-2 w-48" id="mobileMenu">
 <button class="w-full text-left px-4 py-2 hover:bg-gray-100 rounded" onclick="document.getElementById('addItemButton').click()">➕ Añadir item</button>
-<button class="w-full text-left px-4 py-2 hover:bg-gray-100 rounded" onclick="document.getElementById('viewAllButton').click(); DOM.mobileMenu.classList.add('hidden');">📄 Ver todo</button>
+<button class="w-full text-left px-4 py-2 hover:bg-gray-100 rounded" onclick="handleMobileViewAll()">📄 Ver todo</button>
 <button class="w-full text-left px-4 py-2 hover:bg-gray-100 rounded" onclick="openMFCModal()">🛠 MFC</button>
 </div>
 <script>
@@ -204,6 +204,10 @@
         }
 
         function setupEventListeners() {
+    function handleMobileViewAll() {
+        document.getElementById('viewAllButton').click();
+        if (DOM.mobileMenu) DOM.mobileMenu.classList.remove('active');
+    }
             DOM.logoButton.addEventListener('click', () => showView('search'));
             DOM.viewAllButton.addEventListener('click', () => { DOM.searchInput.value = ''; renderNotes(allNotes); showView('items'); });
             DOM.mfcButton.addEventListener('click', () => toggleModal('mfcModal', true));
