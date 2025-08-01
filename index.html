@@ -400,9 +400,7 @@
 
                 const noteData = { 
                     titulo: title,
-                    descripcion: content,
-                    
-                    fileURL: fileURL,
+                    descripcion: content, fileURL: fileURL,
                     filePath: filePath,
                     fileName: fileName,
                     fecha: firebase.firestore.Timestamp.fromDate(new Date())
@@ -453,8 +451,7 @@
             notes.forEach(note => {
                 const noteElement = document.createElement('div');
                 noteElement.className = 'note-card bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex flex-col';
-                const tagsHTML = "";
-            });
+                });
             document.querySelectorAll('.delete-note-btn').forEach(b => b.addEventListener('click', (e) => { e.stopPropagation(); confirmDelete(e.currentTarget.dataset.id); }));
             document.querySelectorAll('.edit-note-btn').forEach(b => b.addEventListener('click', (e) => { e.stopPropagation(); const note = allNotes.find(n=>n.id===e.currentTarget.dataset.id); if(note) openEditModal(note); }));
         }
