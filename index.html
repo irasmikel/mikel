@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Mikel - Gestión de Notas</title>
+<title>Acceso Seguro</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <link crossorigin="anonymous" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" referrerpolicy="no-referrer" rel="stylesheet"/>
 <style>
   @media (max-width: 768px) {
@@ -13,36 +13,10 @@
     .note-card .items-end { align-self: flex-end; margin-top: 1rem; }
     #pinScreen { padding: 2rem; }
   }
-  
-  :root {
-    --primary: #6366f1;
-    --primary-dark: #4f46e5;
-    --secondary: #8b5cf6;
-    --accent: #ec4899;
-    --light: #f8fafc;
-    --dark: #1e293b;
-    --gray: #64748b;
-    --success: #10b981;
-    --warning: #f59e0b;
-    --danger: #ef4444;
-  }
-  
-  body { 
-    font-family: 'Inter', sans-serif; 
-    background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
-    min-height: 100vh;
-    color: var(--dark);
-  }
-  
-  .main-search-container { 
-    min-height: calc(100vh - 200px); 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-  }
-  
+  body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
+  .main-search-container { min-height: calc(100vh - 200px); display: flex; align-items: center; justify-content: center; }
   .tag {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      background-color: #4f46e5;
       color: white;
       padding: 0.25rem 0.6rem;
       border-radius: 9999px;
@@ -52,225 +26,58 @@
       align-items: center;
       gap: 0.25rem;
       transition: all 0.2s ease-in-out;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      background-image: linear-gradient(to right, #4f46e5, #8b5cf6);
   }
-  
   .tag:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(99, 102, 241, 0.3);
+      transform: scale(1.05);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
   }
-  
-  .note-card { 
-    transition: all 0.3s ease;
-    border-radius: 16px;
-    overflow: hidden;
-    background: white;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-  }
-  
-  .note-card:hover { 
-    transform: translateY(-5px); 
-    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.1);
-  }
-  
-  .modal { 
-    display: none; 
-    opacity: 0; 
-    transition: opacity 0.3s ease; 
-  }
-  
-  .modal.active { 
-    display: flex; 
-    opacity: 1; 
-  }
-  
-  .modal-content { 
-    transform: scale(0.95); 
-    transition: transform 0.3s ease;
-    border-radius: 20px;
-    overflow: hidden;
-  }
-  
-  .modal.active .modal-content { 
-    transform: scale(1); 
-  }
-  
-  input[type="file"] { 
-    display: none; 
-  }
-  
-  #toast-container { 
-    position: fixed; 
-    top: 20px; 
-    right: 20px; 
-    z-index: 100; 
-  }
-  
-  .toast { 
-    display: flex; 
-    align-items: center; 
-    padding: 1rem 1.5rem; 
-    border-radius: 12px; 
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1); 
-    opacity: 0; 
-    transform: translateX(100%); 
-    transition: all 0.3s ease-in-out; 
-    backdrop-filter: blur(10px);
-  }
-  
-  .toast.show { 
-    opacity: 1; 
-    transform: translateX(0); 
-  }
-  
-  .toast.success { 
-    background: rgba(16, 185, 129, 0.9); 
-    color: white; 
-  }
-  
-  .toast.error { 
-    background: rgba(239, 68, 68, 0.9); 
-    color: white; 
-  }
-  
-  .search-results-container { 
-    min-height: 200px; 
-    display: flex; 
-    flex-direction: column; 
-    justify-content: center; 
-    align-items: center; 
-  }
-  
-  .search-results-list { 
-    width: 100%; 
-    max-width: 800px; 
-  }
-  
-  .search-result-item { 
-    background-color: white; 
-    border: 1px solid #e2e8f0; 
-    padding: 16px; 
-    margin-bottom: 16px; 
-    border-radius: 12px; 
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
-  }
-  
+  .note-card { transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; }
+  .note-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.07), 0 4px 6px -4px rgb(0 0 0 / 0.07); }
+  .modal { display: none; opacity: 0; transition: opacity 0.3s ease; }
+  .modal.active { display: flex; opacity: 1; }
+  .modal-content { transform: scale(0.95); transition: transform 0.3s ease; }
+  .modal.active .modal-content { transform: scale(1); }
+  input[type="file"] { display: none; }
+  #toast-container { position: fixed; top: 20px; right: 20px; z-index: 100; }
+  .toast { display: flex; align-items: center; padding: 1rem 1.5rem; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); opacity: 0; transform: translateX(100%); transition: all 0.3s ease-in-out; }
+  .toast.show { opacity: 1; transform: translateX(0); }
+  .toast.success { background-color: #d1fae5; color: #065f46; }
+  .toast.error { background-color: #fee2e2; color: #991b1b; }
+  .search-results-container { min-height: 200px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+  .search-results-list { width: 100%; max-width: 800px; }
+  .search-result-item { background-color: white; border: 1px solid #e2e8f0; padding: 16px; margin-bottom: 16px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
   .mobile-menu {
       transition: transform 0.3s ease-in-out;
       transform: translateX(100%);
   }
-  
   .mobile-menu.active {
       transform: translateX(0);
   }
-  
   .dropdown-menu {
       display: none;
   }
-  
   .dropdown-menu.active {
       display: block;
   }
-  
-  /* Estilos modernizados */
-  .btn-primary {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-    color: white;
-    border: none;
-    border-radius: 12px;
-    padding: 0.75rem 1.5rem;
-    font-weight: 500;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 6px rgba(99, 102, 241, 0.2);
-  }
-  
-  .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(99, 102, 241, 0.3);
-  }
-  
-  .btn-secondary {
-    background: white;
-    color: var(--dark);
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 0.75rem 1.5rem;
-    font-weight: 500;
-    transition: all 0.3s ease;
-  }
-  
-  .btn-secondary:hover {
-    background: #f8fafc;
-    transform: translateY(-1px);
-  }
-  
-  .input-field {
-    background: white;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 0.75rem 1rem;
-    transition: all 0.3s ease;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  }
-  
-  .input-field:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
-    outline: none;
-  }
-  
-  .gradient-bg {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-  }
-  
-  .glass-effect {
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-  }
-  
-  .floating {
-    animation: floating 3s ease-in-out infinite;
-  }
-  
-  @keyframes floating {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
-    100% { transform: translateY(0px); }
-  }
-  
-  .logo-container {
-    width: 80px;
-    height: 80px;
-    border-radius: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2rem;
-    color: white;
-    margin-bottom: 1.5rem;
-    box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
-  }
 </style>
 </head>
-<body class="flex items-center justify-center min-h-screen">
+<body class="bg-gray-100 flex items-center justify-center h-screen">
 <div class="hidden md:block fixed top-4 right-4 z-50">
-<button class="text-gray-700 bg-white p-3 rounded-full shadow-lg hover:bg-gray-100 transition-all" onclick="logoutApp()">
+<button class="text-gray-700 bg-white p-2 rounded shadow-md hover:bg-gray-100" onclick="logoutApp()">
 <i class="fas fa-sign-out-alt"></i>
 </button>
 </div>
 
 <div class="md:hidden fixed top-4 left-4 z-50">
-<button class="text-gray-700 bg-white p-3 rounded-full shadow-lg" onclick="toggleMobileMenu()">
+<button class="text-gray-700 bg-white p-2 rounded shadow-md" onclick="toggleMobileMenu()">
 <i class="fas fa-bars fa-lg"></i>
 </button>
 </div>
-<!-- Mobile Menu (initially hidden, will be shown by JS) -->
-<div class="hidden fixed top-16 left-4 bg-white rounded-xl shadow-xl p-4 z-40 space-y-2 w-48" id="mobileMenu">
-    <!-- Buttons will have event listeners in JS -->
-    <button class="w-full text-left px-4 py-3 hover:bg-gray-100 rounded-lg transition-all" id="mobileAddItemButton">➕ Añadir item</button>
-    <button class="w-full text-left px-4 py-3 hover:bg-gray-100 rounded-lg transition-all" id="mobileViewAllButton">📄 Ver todo</button>
-    <button class="w-full text-left px-4 py-3 hover:bg-gray-100 rounded-lg transition-all" id="mobileMfcButton">🛠 Recursos</button>
+<div class="hidden fixed top-16 left-4 bg-white rounded-lg shadow-lg p-4 z-40 space-y-2 w-48" id="mobileMenu">
+    <button class="w-full text-left px-4 py-2 hover:bg-gray-100 rounded" id="mobileAddItemButton">➕ Añadir item</button>
+    <button class="w-full text-left px-4 py-2 hover:bg-gray-100 rounded" id="mobileViewAllButton">📄 Ver todo</button>
+    <button class="w-full text-left px-4 py-2 hover:bg-gray-100 rounded" id="mobileMfcButton">🛠 Recursos</button>
 </div>
 
 <script>
@@ -282,44 +89,38 @@
 
 <div class="fixed inset-0 flex items-center justify-center bg-white z-50" id="loader">
 <div class="text-center space-y-4">
-<svg class="animate-spin h-12 w-12 text-indigo-600 mx-auto" fill="none" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<svg class="animate-spin h-10 w-10 text-blue-600 mx-auto" fill="none" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
 <path class="opacity-75" d="M4 12a8 8 0 018-8v8z" fill="currentColor"></path>
 </svg>
 <p class="text-gray-700 text-lg font-medium">Cargando…</p>
 </div>
 </div>
-
-<div class="text-center space-y-8 p-8 max-w-md w-full" id="pinScreen">
-<div class="logo-container gradient-bg floating">
-  <i class="fa-solid fa-plus"></i>
-</div>
-<h1 class="text-3xl font-bold text-gray-800">Acceso a Mikel</h1>
-<p class="text-gray-600">Introduce tu PIN para continuar</p>
-<input class="input-field w-full text-center text-2xl tracking-widest mt-4" id="pinInput" maxlength="4" placeholder="PIN" type="password"/>
+<div class="text-center space-y-6" id="pinScreen">
+<h1 class="text-2xl font-bold">Introduce el PIN para acceder</h1>
+<input class="px-4 py-2 border rounded text-center text-xl" id="pinInput" maxlength="4" placeholder="PIN" type="password"/>
 <div>
-<button class="btn-primary w-full mt-6" onclick="checkPIN()">Entrar</button>
+<button class="mt-4 bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700" onclick="checkPIN()">Entrar</button>
 </div>
-<p class="text-red-500 font-medium hidden mt-4" id="errorMsg">PIN incorrecto</p>
+<p class="text-red-500 font-medium hidden" id="errorMsg">PIN incorrecto</p>
 </div>
-
 <div id="appContent" style="display: none;">
-<header class="glass-effect sticky top-0 z-40 border-b border-gray-200 hidden" id="app-header">
+<header class="bg-white/80 backdrop-blur-lg sticky top-0 z-40 border-b border-gray-200 hidden" id="app-header">
 <div class="container mx-auto px-4 sm:px-6 lg:px-8">
 <div class="flex items-center justify-between h-16">
 <div class="flex items-center">
-<button class="flex items-center gap-2 text-xl font-bold text-gray-800" id="logoButton"><span class="gradient-bg text-white rounded-md w-8 h-8 flex items-center justify-center"><i class="fa-solid fa-plus"></i></span> Mikel</button>
+<button class="flex items-center gap-2 text-xl font-bold text-gray-800" id="logoButton"><span class="bg-gray-800 text-white rounded-md w-7 h-7 flex items-center justify-center"><i class="fa-solid fa-plus"></i></span> Mikel</button>
 </div>
 <nav class="hidden md:flex items-center gap-3">
-<button class="btn-secondary flex items-center gap-2" id="viewAllButton">
+<button class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50" id="viewAllButton">
 <i class="fa-solid fa-list"></i> Ver Todo
-</button>
-<button class="btn-secondary flex items-center gap-2" id="mfcButton">
+                    </button>
+<button class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50" id="mfcButton">
 <i class="fa-solid fa-download"></i> Recursos
-</button>
-<button class="btn-primary flex items-center gap-2" id="addItemButtonHeader">
+                    </button>
+<button class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-gray-800 rounded-md hover:bg-gray-900" id="addItemButtonHeader">
 <i class="fa-solid fa-plus"></i> Añadir Item
-</button>
+                    </button>
 </nav>
 <button class="md:hidden text-gray-700 text-2xl" id="menuToggleBtn">
 <i class="fas fa-bars"></i>
@@ -327,20 +128,19 @@
 </div>
 </div>
 </header>
-<!-- Mobile menu, now controlled by JS event listeners -->
-<div class="fixed top-0 right-0 h-full w-64 bg-white shadow-xl p-6 z-50 mobile-menu md:hidden" id="mobileMenu">
+<div class="fixed top-0 right-0 h-full w-64 bg-white shadow-lg p-6 z-50 mobile-menu md:hidden" id="mobileMenu">
     <div class="flex justify-between items-center mb-6">
         <h3 class="text-xl font-bold">Menú</h3>
         <button class="text-gray-700 text-2xl" id="closeMobileMenuBtn"><i class="fas fa-times"></i></button>
     </div>
     <div class="flex flex-col space-y-4">
-        <button class="btn-secondary flex items-center gap-2" id="mobileViewAllButton">
+        <button class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50" id="mobileViewAllButton">
             <i class="fa-solid fa-list"></i> Ver Todo
         </button>
-        <button class="btn-secondary flex items-center gap-2" id="mobileMfcButton">
+        <button class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50" id="mobileMfcButton">
             <i class="fa-solid fa-download"></i> Recursos
         </button>
-        <button class="btn-primary flex items-center gap-2" id="mobileAddItemButton">
+        <button class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-gray-800 rounded-md hover:bg-gray-900" id="mobileAddItemButton">
             <i class="fa-solid fa-plus"></i> Añadir Item
         </button>
     </div>
@@ -351,24 +151,19 @@
 <div id="main-search-view">
 <div class="main-search-container">
 <div class="text-center w-full max-w-2xl">
-<div class="flex justify-center items-center gap-3 mb-8">
-  <div class="logo-container gradient-bg floating">
-    <i class="fa-solid fa-plus"></i>
-  </div>
-</div>
+<div class="flex justify-center items-center gap-3 mb-6"><span class="bg-white border-2 border-gray-200 rounded-2xl w-16 h-16 flex items-center justify-center text-2xl"><i class="fa-solid fa-plus"></i></span></div>
 <h1 class="text-5xl font-bold text-gray-800 mb-8">Mikel</h1>
-<p class="text-gray-600 mb-8">Tu gestor de conocimiento personal</p>
-<div class="relative w-full shadow-xl rounded-full flex overflow-hidden">
-<input class="input-field flex-grow pl-6 pr-4 py-4 border-0 rounded-l-full focus:ring-0" id="mainSearchInput" placeholder="Busca en tus notas o en la red..." type="text"/>
+<div class="relative w-full shadow-lg rounded-full flex">
+<input class="flex-grow pl-6 pr-4 py-4 border border-gray-200 rounded-l-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500" id="mainSearchInput" placeholder="Busca en tus notas o en la red..." type="text"/>
 <button class="px-6 bg-gray-800 text-white hover:bg-gray-900 transition-colors" id="mainSearchButton">Buscar</button>
 <div class="relative">
-<button class="px-6 gradient-bg text-white rounded-r-full hover:opacity-90 transition-all h-full flex items-center gap-2" id="webSearchDropdownBtn">
+<button class="px-6 bg-blue-600 text-white rounded-r-full hover:bg-blue-700 transition-colors h-full flex items-center gap-2" id="webSearchDropdownBtn">
                                 Web <i class="fas fa-caret-down"></i>
 </button>
-<div class="dropdown-menu absolute right-0 mt-2 py-2 w-48 bg-white rounded-xl shadow-xl z-20" id="webSearchDropdownMenu">
-<a class="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 rounded-lg" data-type="copytech" href="#" id="dropdown-copytech-btn">Copytechnet</a>
-<a class="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 rounded-lg" data-type="printcopy" href="#" id="dropdown-printcopy-btn">Printcopy.info</a>
-<a class="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 rounded-lg" data-type="google" href="#" id="dropdown-google-btn">Google General</a>
+<div class="dropdown-menu absolute right-0 mt-2 py-2 w-48 bg-white rounded-md shadow-xl z-20" id="webSearchDropdownMenu">
+<a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" data-type="copytech" href="#" id="dropdown-copytech-btn">Copytechnet</a>
+<a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" data-type="printcopy" href="#" id="dropdown-printcopy-btn">Printcopy.info</a>
+<a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" data-type="google" href="#" id="dropdown-google-btn">Google General</a>
 </div>
 </div>
 </div>
@@ -379,66 +174,62 @@
 <div class="flex justify-between items-center mb-6">
 <h2 class="text-2xl font-bold">Base de Conocimiento</h2>
 <div class="relative w-full max-w-xs">
-<input class="input-field w-full pl-10 pr-4 py-3" id="searchInput" placeholder="Filtrar resultados..." type="text"/>
+<input class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" id="searchInput" placeholder="Filtrar resultados..." type="text"/>
 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><i class="fas fa-search text-gray-400"></i></div>
 </div>
 </div>
-<div class="text-center py-10" id="loading-indicator"><i class="fas fa-spinner fa-spin fa-3x text-indigo-500"></i><p class="mt-2 text-gray-600">Cargando notas...</p></div>
-<div class="text-center py-10 bg-white rounded-xl shadow-sm hidden" id="no-notes-message"><i class="fas fa-folder-open fa-3x text-gray-400"></i><p class="mt-4 text-xl font-semibold text-gray-700">No hay items todavía.</p><p class="text-gray-500">Usa el botón "Añadir Item" para empezar.</p></div>
-<div class="text-center py-10 bg-white rounded-xl shadow-sm hidden" id="no-results-message"><i class="fas fa-search-minus fa-3x text-gray-400"></i><p class="mt-4 text-xl font-semibold text-gray-700">No se encontraron resultados.</p><p class="text-gray-500">Prueba con otros términos de búsqueda.</p></div>
+<div class="text-center py-10" id="loading-indicator"><i class="fas fa-spinner fa-spin fa-3x text-blue-500"></i><p class="mt-2 text-gray-600">Cargando notas...</p></div>
+<div class="text-center py-10 bg-white rounded-lg shadow-sm hidden" id="no-notes-message"><i class="fas fa-folder-open fa-3x text-gray-400"></i><p class="mt-4 text-xl font-semibold text-gray-700">No hay items todavía.</p><p class="text-gray-500">Usa el botón "Añadir Item" para empezar.</p></div>
+<div class="text-center py-10 bg-white rounded-lg shadow-sm hidden" id="no-results-message"><i class="fas fa-search-minus fa-3x text-gray-400"></i><p class="mt-4 text-xl font-semibold text-gray-700">No se encontraron resultados.</p><p class="text-gray-500">Prueba con otros términos de búsqueda.</p></div>
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="notes-container"></div>
 </div>
 </main>
 <div class="modal fixed inset-0 bg-gray-900 bg-opacity-75 items-center justify-center p-4 z-50 overflow-y-auto" id="addNoteModal">
-<div class="modal-content bg-white rounded-2xl shadow-2xl w-full max-w-2xl transform transition-all">
-<div class="flex justify-between items-center p-6 border-b border-gray-200"><h3 class="text-2xl font-bold text-gray-800" id="modalTitle">Añadir Nuevo Item</h3><button class="modal-close text-gray-400 hover:text-gray-600" data-modal="addNoteModal"><i class="fas fa-times fa-2x"></i></button></div>
+<div class="modal-content bg-white rounded-xl shadow-2xl w-full max-w-2xl transform transition-all">
+<div class="flex justify-between items-center p-5 border-b border-gray-200"><h3 class="text-2xl font-bold text-gray-800" id="modalTitle">Añadir Nuevo Item</h3><button class="modal-close text-gray-400 hover:text-gray-600" data-modal="addNoteModal"><i class="fas fa-times fa-2x"></i></button></div>
 <form id="addNoteForm" onsubmit="return false;">
 <input id="noteIdToEdit" type="hidden"/>
 <div class="p-6 space-y-4">
-<div><label class="block text-sm font-medium text-gray-700 mb-1" for="noteTitle">Título</label><input class="input-field w-full" id="noteTitle" type="text"/></div>
+<div><label class="block text-sm font-medium text-gray-700 mb-1" for="noteTitle">Título</label><input class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500" id="noteTitle" type="text"/></div>
 <div>
 <div class="flex justify-between items-center mb-1">
 <label class="block text-sm font-medium text-gray-700" for="noteContent">Contenido</label>
 </div>
-<textarea class="input-field w-full" id="noteContent" rows="8"></textarea>
+<textarea class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500" id="noteContent" rows="8"></textarea>
 </div>
 <div>
 <label class="block text-sm font-medium text-gray-700 mb-1">Adjuntos</label>
-<!-- El input de archivo se mantiene oculto y con 'multiple' -->
 <input id="noteAttachment" type="file" multiple/>
-<!-- El label ahora siempre está visible para permitir añadir más archivos -->
-<label class="w-full cursor-pointer bg-white border border-gray-300 rounded-lg p-3 flex items-center justify-center gap-2 hover:bg-gray-50 transition-all" for="noteAttachment" id="noteAttachmentLabel"><i class="fas fa-upload"></i><span>Seleccionar archivos</span></label>
-<!-- Contenedor para la lista de archivos seleccionados -->
-<div class="w-full bg-gray-100 border border-gray-200 rounded-lg p-3 mt-2" id="selected-files-container">
+<label class="w-full cursor-pointer bg-white border border-gray-300 rounded-lg p-2 flex items-center justify-center gap-2 hover:bg-gray-50" for="noteAttachment" id="noteAttachmentLabel"><i class="fas fa-upload"></i><span>Seleccionar archivos</span></label>
+<div class="w-full bg-gray-100 border border-gray-200 rounded-lg p-2 mt-2" id="selected-files-container">
     <div id="file-chosen-list" class="space-y-1">
-        <!-- Los nombres de los archivos se renderizarán aquí -->
-    </div>
+        </div>
     <p id="no-files-selected-message" class="text-sm text-gray-500 text-center py-2">No hay archivos seleccionados.</p>
 </div>
 </div>
 </div>
 </form>
-<div class="bg-gray-50 p-6 flex justify-end rounded-b-2xl"><button class="btn-primary flex items-center gap-2" id="saveNoteButton">Guardar Item</button></div>
+<div class="bg-gray-50 p-5 flex justify-end rounded-b-xl"><button class="bg-gray-800 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-900 transition-colors flex items-center gap-2" id="saveNoteButton">Guardar Item</button></div>
 </div>
 </div>
 <div class="modal fixed inset-0 bg-gray-900 bg-opacity-75 items-center justify-center p-4 z-50 overflow-y-auto" id="mfcModal">
-<div class="modal-content bg-white rounded-2xl shadow-2xl w-full max-w-lg transform transition-all">
-<div class="flex justify-between items-center p-6 border-b border-gray-200"><h3 class="text-2xl font-bold text-gray-800">Recursos</h3><button class="modal-close text-gray-400 hover:text-gray-600" data-modal="mfcModal"><i class="fas fa-times fa-2x"></i></button></div>
+<div class="modal-content bg-white rounded-xl shadow-2xl w-full max-w-lg transform transition-all">
+<div class="flex justify-between items-center p-5 border-b border-gray-200"><h3 class="text-2xl font-bold text-gray-800">Recursos</h3><button class="modal-close text-gray-400 hover:text-gray-600" data-modal="mfcModal"><i class="fas fa-times fa-2x"></i></button></div>
 <div class="p-6">
 <ul class="space-y-4">
-<li><a class="flex items-center gap-3 text-blue-600 hover:text-blue-800 hover:underline" download="" href="MFC.msi"><i class="fas fa-file-archive fa-fw text-lg"></i><span class="font-medium">MFC.msi</span></a></li>
-<li><a class="flex items-center gap-3 text-blue-600 hover:text-blue-800 hover:underline" download="" href="mfc.exe"><i class="fas fa-file-code fa-fw text-lg"></i><span class="font-medium">mfc.exe</span></a></li>
+<li><a class="flex items-center gap-3 text-blue-600 hover:text-blue-800 hover:underline" download="" href="https://firebasestorage.googleapis.com/v0/b/mikelaneako.firebasestorage.app/o/MFC.msi?alt=media&token=0daacbfb-75a9-4d94-87c4-ac366f8b31f7"><i class="fas fa-file-archive fa-fw text-lg"></i><span class="font-medium">MFC.msi</span></a></li>
+<li><a class="flex items-center gap-3 text-blue-600 hover:text-blue-800 hover:underline" download="" href="https://firebasestorage.googleapis.com/v0/b/mikelaneako.firebasestorage.app/o/mfc.exe?alt=media&token=4e8a9bd2-6c55-4a54-a316-b7bad9839113"><i class="fas fa-file-code fa-fw text-lg"></i><span class="font-medium">mfc.exe</span></a></li>
 <li><a class="flex items-center gap-3 text-green-600 hover:text-green-800 hover:underline" href="https://mfc.maquelsa.com/mfc3/access.php" rel="noopener noreferrer" target="_blank"><i class="fas fa-external-link-alt fa-fw text-lg"></i><span class="font-medium">Acceso Web 1 (Maquelsa)</span></a></li>
 <li><a class="flex items-center gap-3 text-green-600 hover:text-green-800 hover:underline" href="https://mirror1.infodesain.com/nodeprint/access.php" rel="noopener noreferrer" target="_blank"><i class="fas fa-external-link-alt fa-fw text-lg"></i><span class="font-medium">Acceso Web 2 (Mirror)</span></a></li>
 </ul>
-<p class="mt-6 text-sm text-yellow-700 bg-yellow-100 p-3 rounded-lg"><i class="fas fa-exclamation-triangle mr-2"></i><strong>Importante:</strong> Los ficheros descargables son de ejemplo. Debes actualizarlos con tus propias URLs.</p>
+<p class="mt-6 text-sm text-yellow-700 bg-yellow-100 p-3 rounded-md"><i class="fas fa-exclamation-triangle mr-2"></i><strong>Importante:</strong> Los ficheros descargables son de ejemplo. Debes actualizarlos con tus propias URLs.</p>
 </div>
 </div>
 </div>
 <div class="modal fixed inset-0 bg-gray-900 bg-opacity-75 items-center justify-center p-4 z-50" id="confirmationModal">
-<div class="modal-content bg-white rounded-2xl shadow-2xl w-full max-w-md transform transition-all">
+<div class="modal-content bg-white rounded-xl shadow-2xl w-full max-w-md transform transition-all">
 <div class="p-6 text-center"><i class="fas fa-exclamation-triangle fa-3x text-yellow-400 mb-4"></i><h3 class="text-xl font-bold text-gray-800">Confirmación Requerida</h3><p class="text-gray-600 my-4" id="confirmationMessage">¿Estás seguro?</p></div>
-<div class="bg-gray-50 p-4 flex justify-center gap-4 rounded-b-2xl"><button class="px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50" id="cancelButton">Cancelar</button><button class="px-6 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700" id="confirmButton">Confirmar</button></div>
+<div class="bg-gray-50 p-4 flex justify-center gap-4 rounded-b-xl"><button class="px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50" id="cancelButton">Cancelar</button><button class="px-6 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700" id="confirmButton">Confirmar</button></div>
 </div>
 </div>
 </div>
@@ -469,148 +260,49 @@
   }
 </script>
 
-<!-- Cargar Firebase con manejo de errores -->
+<script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-storage-compat.js"></script>
 <script>
-  // Función para cargar scripts con manejo de errores
-  function loadScript(src, fallback) {
-    return new Promise((resolve, reject) => {
-      const script = document.createElement('script');
-      script.src = src;
-      script.onload = resolve;
-      script.onerror = () => {
-        console.error(`Error al cargar el script: ${src}`);
-        if (fallback) fallback();
-        reject();
-      };
-      document.head.appendChild(script);
-    });
-  }
-  
-  // Intentar cargar Firebase desde diferentes CDNs
-  const firebaseCDNs = [
-    "https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js",
-    "https://cdn.jsdelivr.net/npm/firebase@9.15.0/firebase-app-compat.js",
-    "https://unpkg.com/firebase@9.15.0/firebase-app-compat.js"
-  ];
-  
-  let currentCDNIndex = 0;
-  
-  function loadFirebaseWithFallback() {
-    if (currentCDNIndex >= firebaseCDNs.length) {
-      console.error("No se pudo cargar Firebase desde ningún CDN. La aplicación funcionará en modo demostración.");
-      initializeAppWithoutFirebase();
-      return;
-    }
-    
-    const currentCDN = firebaseCDNs[currentCDNIndex];
-    console.log(`Intentando cargar Firebase desde: ${currentCDN}`);
-    
-    loadScript(currentCDN)
-      .then(() => {
-        // Cargar los demás módulos de Firebase desde el mismo CDN
-        const baseCDN = currentCDN.substring(0, currentCDN.lastIndexOf('/') + 1);
-        
-        Promise.all([
-          loadScript(`${baseCDN}firebase-firestore-compat.js`),
-          loadScript(`${baseCDN}firebase-auth-compat.js`),
-          loadScript(`${baseCDN}firebase-storage-compat.js`)
-        ]).then(() => {
-          initializeAppWithFirebase();
-        }).catch(() => {
-          currentCDNIndex++;
-          loadFirebaseWithFallback();
-        });
-      })
-      .catch(() => {
-        currentCDNIndex++;
-        loadFirebaseWithFallback();
-      });
-  }
-  
-  // Inicializar la aplicación con Firebase
-  function initializeAppWithFirebase() {
-    try {
-      // Configuración de Firebase
-      const firebaseConfig = {
-          apiKey: "AIzaSyA26sad8msWrNTVByMs8umSUV_OJsqctuE",
-          authDomain: "mikelaneako.firebaseapp.com",
-          projectId: "mikelaneako",
-          storageBucket: "mikelaneako.firebasestorage.app",
-          messagingSenderId: "261413636045",
-          appId: "1:261413636045:web:717b7e87d84a345e816684"
-      };
-      
-      firebase.initializeApp(firebaseConfig);
-      
-      // Inicializar variables globales
-      window.db = firebase.firestore();
-      window.storage = firebase.storage();
-      window.auth = firebase.auth();
-      window.firebaseLoaded = true;
-      
-      // Iniciar la aplicación
-      startApp();
-    } catch (error) {
-      console.error("Error al inicializar Firebase:", error);
-      initializeAppWithoutFirebase();
-    }
-  }
-  
-  // Inicializar la aplicación sin Firebase (modo demostración)
-  function initializeAppWithoutFirebase() {
-    console.warn("Firebase no está disponible. La aplicación funcionará en modo demostración.");
-    window.firebaseLoaded = false;
-    window.db = null;
-    window.storage = null;
-    window.auth = null;
-    
-    // Iniciar la aplicación en modo demostración
-    startApp();
-  }
-  
-  // Iniciar la aplicación
-  function startApp() {
-    // Variables globales
-    window.allNotes = [];
-    window.DOM = {};
-    window.currentSelectedFiles = [];
-    
-    // Inicializar elementos DOM y event listeners
-    initializeDOMElements();
-    setupEventListeners();
-    
-    if (window.firebaseLoaded && window.auth) {
-      // Iniciar sesión anónima con Firebase
-      window.auth.signInAnonymously().then(() => {
-        window.DOM.appHeader.classList.remove('hidden');
-        window.DOM.appMain.classList.remove('hidden');
-        showView('search');
-        loadNotes();
-      }).catch((error) => {
-        console.error("Error al iniciar sesión anónimamente:", error);
-        showToast("Error de autenticación. La aplicación puede no funcionar correctamente.", "error");
-        window.DOM.appHeader.classList.remove('hidden');
-        window.DOM.appMain.classList.remove('hidden');
-        showView('search');
-        loadDemoNotes();
-      });
-    } else {
-      // Modo demostración sin Firebase
-      console.log("Iniciando en modo demostración sin Firebase");
-      window.DOM.appHeader.classList.remove('hidden');
-      window.DOM.appMain.classList.remove('hidden');
-      showView('search');
-      loadDemoNotes();
-    }
-  }
-  
-  // Iniciar la carga de Firebase
-  loadFirebaseWithFallback();
-</script>
+    // Configuración de Firebase (mantén tu propia API Key y Project ID)
+    const firebaseConfig = {
+        apiKey: "AIzaSyA26sad8msWrNTVByMs8umSUV_OJsqctuE", // Reemplaza con tu API Key
+        authDomain: "mikelaneako.firebaseapp.com",
+        projectId: "mikelaneako",
+        storageBucket: "mikelaneako.firebasestorage.app",
+        messagingSenderId: "261413636045",
+        appId: "1:261413636045:web:717b7e87d84a345e816684"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const storage = firebase.storage();
+    const auth = firebase.auth();
+    let allNotes = [];
+    let DOM = {};
+    // Variable global para almacenar los archivos seleccionados en el modal de añadir/editar
+    // Cada elemento puede ser un File object (para archivos nuevos) o un objeto {name, url, path, isExisting: true} (para archivos ya subidos)
+    let currentSelectedFiles = [];
 
-<script>
+    window.onload = () => {
+        initializeDOMElements();
+        setupEventListeners();
+        auth.signInAnonymously().then(() => {
+            DOM.appHeader.classList.remove('hidden');
+            DOM.appMain.classList.remove('hidden');
+            showView('search');
+            loadNotes();
+        }).catch((error) => {
+            console.error("Error al iniciar sesión anónimamente:", error);
+            showToast("Error de autenticación. La aplicación puede no funcionar correctamente.", "error");
+            DOM.appHeader.classList.remove('hidden');
+            DOM.appMain.classList.remove('hidden');
+            showView('search');
+        });
+    };
+
     function initializeDOMElements() {
-        window.DOM = {
+        DOM = {
             appHeader: document.getElementById('app-header'),
             appMain: document.getElementById('app-main'),
             mainSearchView: document.getElementById('main-search-view'),
@@ -635,6 +327,7 @@
             noteContentInput: document.getElementById('noteContent'),
             noteAttachmentInput: document.getElementById('noteAttachment'),
             noteAttachmentLabel: document.getElementById('noteAttachmentLabel'),
+            // Elementos DOM actualizados para la lista de archivos
             selectedFilesContainer: document.getElementById('selected-files-container'),
             fileChosenList: document.getElementById('file-chosen-list'),
             noFilesSelectedMessage: document.getElementById('no-files-selected-message'),
@@ -657,67 +350,67 @@
     }
 
     function setupEventListeners() {
-        window.DOM.logoButton.addEventListener('click', () => showView('search'));
-        window.DOM.viewAllButton.addEventListener('click', () => { window.DOM.searchInput.value = ''; renderNotes(window.allNotes); showView('items'); });
-        window.DOM.mfcButton.addEventListener('click', () => toggleModal('mfcModal', true));
-        window.DOM.mainSearchButton.addEventListener('click', () => performSearch(window.DOM.mainSearchInput.value, 'db'));
-        window.DOM.mainSearchInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') performSearch(window.DOM.mainSearchInput.value, 'db'); });
-        window.DOM.searchInput.addEventListener('input', () => filterNotes(window.DOM.searchInput.value));
-        window.DOM.addItemButtonHeader.addEventListener('click', () => openAddModal());
+        DOM.logoButton.addEventListener('click', () => showView('search'));
+        DOM.viewAllButton.addEventListener('click', () => { DOM.searchInput.value = ''; renderNotes(allNotes); showView('items'); });
+        DOM.mfcButton.addEventListener('click', () => toggleModal('mfcModal', true));
+        DOM.mainSearchButton.addEventListener('click', () => performSearch(DOM.mainSearchInput.value, 'db'));
+        DOM.mainSearchInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') performSearch(DOM.mainSearchInput.value, 'db'); });
+        DOM.searchInput.addEventListener('input', () => filterNotes(DOM.searchInput.value));
+        DOM.addItemButtonHeader.addEventListener('click', () => openAddModal());
         document.querySelectorAll('.modal-close').forEach(btn => btn.addEventListener('click', () => toggleModal(btn.dataset.modal, false)));
-        window.DOM.saveNoteButton.addEventListener('click', saveNote);
-        window.DOM.noteAttachmentInput.addEventListener('change', handleFileSelect);
-        window.DOM.cancelButton.addEventListener('click', () => toggleModal('confirmationModal', false));
+        DOM.saveNoteButton.addEventListener('click', saveNote);
+        DOM.noteAttachmentInput.addEventListener('change', handleFileSelect);
+        // El botón de eliminar individual se añade dinámicamente, no necesita un listener aquí
+        DOM.cancelButton.addEventListener('click', () => toggleModal('confirmationModal', false));
         
         // Toggle dropdown menu
-        window.DOM.webSearchDropdownBtn.addEventListener('click', (e) => {
+        DOM.webSearchDropdownBtn.addEventListener('click', (e) => {
             e.stopPropagation();
-            window.DOM.webSearchDropdownMenu.classList.toggle('active');
+            DOM.webSearchDropdownMenu.classList.toggle('active');
         });
         document.addEventListener('click', (e) => {
-            if (!window.DOM.webSearchDropdownBtn.contains(e.target) && !window.DOM.webSearchDropdownMenu.contains(e.target)) {
-                window.DOM.webSearchDropdownMenu.classList.remove('active');
+            if (!DOM.webSearchDropdownBtn.contains(e.target) && !DOM.webSearchDropdownMenu.contains(e.target)) {
+                DOM.webSearchDropdownMenu.classList.remove('active');
             }
         });
-        
         // Event listeners para los botones del dropdown
         document.getElementById('dropdown-copytech-btn').addEventListener('click', (e) => {
-            performSearch(window.DOM.mainSearchInput.value, 'copytech');
-            window.DOM.webSearchDropdownMenu.classList.remove('active');
+            performSearch(DOM.mainSearchInput.value, 'copytech');
+            DOM.webSearchDropdownMenu.classList.remove('active');
         });
         document.getElementById('dropdown-printcopy-btn').addEventListener('click', (e) => {
-            performSearch(window.DOM.mainSearchInput.value, 'printcopy');
-            window.DOM.webSearchDropdownMenu.classList.remove('active');
+            performSearch(DOM.mainSearchInput.value, 'printcopy');
+            DOM.webSearchDropdownMenu.classList.remove('active');
         });
         document.getElementById('dropdown-google-btn').addEventListener('click', (e) => {
-            performSearch(window.DOM.mainSearchInput.value, 'google');
-            window.DOM.webSearchDropdownMenu.classList.remove('active');
+            performSearch(DOM.mainSearchInput.value, 'google');
+            DOM.webSearchDropdownMenu.classList.remove('active');
         });
 
         // Event listeners para el menú móvil
-        if (window.DOM.menuToggleBtn) window.DOM.menuToggleBtn.addEventListener('click', () => window.DOM.mobileMenu.classList.add('active'));
-        if (window.DOM.closeMobileMenuBtn) window.DOM.closeMobileMenuBtn.addEventListener('click', () => window.DOM.mobileMenu.classList.remove('active'));
+        if (DOM.menuToggleBtn) DOM.menuToggleBtn.addEventListener('click', () => DOM.mobileMenu.classList.add('active'));
+        if (DOM.closeMobileMenuBtn) DOM.closeMobileMenuBtn.addEventListener('click', () => DOM.mobileMenu.classList.remove('active'));
         
         // Funcionalidad de los botones del menú móvil
-        window.DOM.mobileViewAllButton.addEventListener('click', () => {
-            window.DOM.searchInput.value = '';
-            renderNotes(window.allNotes);
+        DOM.mobileViewAllButton.addEventListener('click', () => {
+            DOM.searchInput.value = '';
+            renderNotes(allNotes);
             showView('items');
-            window.DOM.mobileMenu.classList.remove('active');
+            DOM.mobileMenu.classList.remove('active'); // Cerrar el menú después de la selección
         });
-        window.DOM.mobileAddItemButton.addEventListener('click', () => {
+        DOM.mobileAddItemButton.addEventListener('click', () => {
             openAddModal();
-            window.DOM.mobileMenu.classList.remove('active');
+            DOM.mobileMenu.classList.remove('active'); // Cerrar el menú después de la selección
         });
-        window.DOM.mobileMfcButton.addEventListener('click', () => {
+        DOM.mobileMfcButton.addEventListener('click', () => {
             toggleModal('mfcModal', true);
-            window.DOM.mobileMenu.classList.remove('active');
+            DOM.mobileMenu.classList.remove('active'); // Cerrar el menú después de la selección
         });
     }
 
     function showView(viewName) {
-        window.DOM.mainSearchView.classList.toggle('hidden', viewName !== 'search');
-        window.DOM.allItemsView.classList.toggle('hidden', viewName !== 'items');
+        DOM.mainSearchView.classList.toggle('hidden', viewName !== 'search');
+        DOM.allItemsView.classList.toggle('hidden', viewName !== 'items');
     }
 
     function performSearch(searchTerm, type) {
@@ -740,6 +433,15 @@
             window.location.href = searchUrl;
         }
     }
+    
+    // Las funciones de IA se han eliminado del código, solo para evitar errores.
+    function improveContentWithAI() {
+        showToast("Funcionalidad IA no implementada en esta versión.", "error");
+    }
+
+    function suggestTagsWithAI() {
+        showToast("Funcionalidad IA no implementada en esta versión.", "error");
+    }
 
     function toggleModal(modalId, show) {
         const modal = document.getElementById(modalId);
@@ -752,25 +454,28 @@
     
     function openAddModal() {
         resetAddNoteForm();
-        window.DOM.modalTitle.textContent = "Añadir Nuevo Item";
+        DOM.modalTitle.textContent = "Añadir Nuevo Item";
         toggleModal('addNoteModal', true);
     }
 
     function openEditModal(note) {
-        resetAddNoteForm();
-        window.DOM.modalTitle.textContent = "Editar Item";
-        window.DOM.noteIdToEdit.value = note.id;
-        window.DOM.noteTitleInput.value = note.titulo;
-        window.DOM.noteContentInput.value = note.descripcion;
+        resetAddNoteForm(); // Esto limpiará currentSelectedFiles y la visualización
+        DOM.modalTitle.textContent = "Editar Item";
+        DOM.noteIdToEdit.value = note.id;
+        DOM.noteTitleInput.value = note.titulo;
+        DOM.noteContentInput.value = note.descripcion;
 
+        // Si la nota tiene adjuntos existentes, los cargamos en currentSelectedFiles
         if (note.attachments && note.attachments.length > 0) {
-            window.currentSelectedFiles = note.attachments.map(att => ({
+            // Marcamos los archivos existentes con 'isExisting: true' para diferenciarlos de los nuevos archivos subidos.
+            // Esto es crucial para la lógica de guardar/eliminar en saveNote.
+            currentSelectedFiles = note.attachments.map(att => ({
                 name: att.name,
                 url: att.url,
                 path: att.path,
-                isExisting: true
+                isExisting: true // Flag para indicar que este archivo ya existe en Storage
             }));
-            renderSelectedFiles();
+            renderSelectedFiles(); // Renderizar todos los archivos cargados
         } else {
             clearSelectedFiles();
         }
@@ -778,73 +483,74 @@
     }
 
     function resetAddNoteForm() {
-        window.DOM.addNoteForm.reset();
-        window.DOM.noteIdToEdit.value = '';
-        clearSelectedFiles();
+        DOM.addNoteForm.reset();
+        DOM.noteIdToEdit.value = '';
+        clearSelectedFiles(); // Llama a la nueva función para limpiar adjuntos
     }
 
+    // Función modificada para manejar la selección acumulativa de múltiples archivos
     function handleFileSelect(e) {
         const newFiles = Array.from(e.target.files);
+        // Filtrar archivos nuevos para evitar duplicados por nombre y tamaño
         const uniqueNewFiles = newFiles.filter(newFile =>
-            !window.currentSelectedFiles.some(existingFile =>
+            !currentSelectedFiles.some(existingFile =>
                 existingFile.name === newFile.name && existingFile.size === newFile.size
             )
         );
-        window.currentSelectedFiles = [...window.currentSelectedFiles, ...uniqueNewFiles];
+        // Añadir los archivos únicos a la lista actual
+        currentSelectedFiles = [...currentSelectedFiles, ...uniqueNewFiles];
         
-        renderSelectedFiles();
+        renderSelectedFiles(); // Renderizar la lista actualizada de archivos
+        // Limpiar el valor del input de archivo para que el evento 'change' se dispare de nuevo
+        // si el usuario selecciona los mismos archivos o más archivos después.
         e.target.value = ''; 
     }
 
+    // Función para renderizar la lista de archivos seleccionados en el modal
     function renderSelectedFiles() {
-        window.DOM.fileChosenList.innerHTML = '';
-        if (window.currentSelectedFiles.length > 0) {
-            window.DOM.noFilesSelectedMessage.classList.add('hidden');
-            window.currentSelectedFiles.forEach((file, index) => {
+        DOM.fileChosenList.innerHTML = ''; // Limpiar la lista actual
+        if (currentSelectedFiles.length > 0) {
+            DOM.noFilesSelectedMessage.classList.add('hidden');
+            currentSelectedFiles.forEach((file, index) => {
                 const fileItem = document.createElement('div');
-                fileItem.className = 'flex items-center justify-between bg-white border border-gray-200 rounded-lg p-2 text-sm text-gray-700';
+                fileItem.className = 'flex items-center justify-between bg-white border border-gray-200 rounded-md p-2 text-sm text-gray-700';
                 fileItem.innerHTML = `
                     <span>${escapeHTML(file.name)}</span>
                     <button type="button" class="text-red-500 hover:text-red-700 ml-2" data-index="${index}">
                         <i class="fas fa-times"></i>
                     </button>
                 `;
-                window.DOM.fileChosenList.appendChild(fileItem);
+                DOM.fileChosenList.appendChild(fileItem);
             });
-            window.DOM.fileChosenList.querySelectorAll('button').forEach(button => {
+            // Añadir event listeners a los nuevos botones de eliminar
+            DOM.fileChosenList.querySelectorAll('button').forEach(button => {
                 button.addEventListener('click', (e) => {
                     const indexToRemove = parseInt(e.currentTarget.dataset.index);
                     removeIndividualFile(indexToRemove);
                 });
             });
         } else {
-            window.DOM.noFilesSelectedMessage.classList.remove('hidden');
+            DOM.noFilesSelectedMessage.classList.remove('hidden');
         }
     }
 
+    // Nueva función para eliminar un archivo individual de la lista
     function removeIndividualFile(index) {
-        window.currentSelectedFiles.splice(index, 1);
-        renderSelectedFiles();
+        currentSelectedFiles.splice(index, 1); // Eliminar el archivo por índice
+        renderSelectedFiles(); // Volver a renderizar la lista
     }
 
+    // Función para limpiar la selección de archivos (todos)
     function clearSelectedFiles() {
-        window.DOM.noteAttachmentInput.value = '';
-        window.currentSelectedFiles = [];
-        renderSelectedFiles();
+        DOM.noteAttachmentInput.value = ''; // Limpiar el campo de entrada
+        currentSelectedFiles = []; // Limpiar el array de archivos seleccionados
+        renderSelectedFiles(); // Volver a renderizar la lista (mostrará "No hay archivos seleccionados.")
     }
     
+    // Función para subir múltiples archivos a Firebase Storage
     async function uploadFiles(files) {
-        if (!window.firebaseLoaded || !window.storage) {
-            return Array.from(files).map(file => ({
-                name: file.name,
-                url: URL.createObjectURL(file),
-                path: `demo/${file.name}`,
-                isExisting: false
-            }));
-        }
-        
         const uploadPromises = Array.from(files).map(async (file) => {
-            const storageRef = window.storage.ref("adjuntos/" + Date.now() + "-" + file.name);
+            const storageRef = storage.ref("adjuntos/" + Date.now() + "-" + file.name);
             await storageRef.put(file);
             const downloadURL = await storageRef.getDownloadURL();
             return { url: downloadURL, path: storageRef.fullPath, name: file.name };
@@ -852,130 +558,84 @@
         return await Promise.all(uploadPromises);
     }
 
+    // --- CRUD OPERATIONS ---
     function loadNotes() {
-        if (!window.firebaseLoaded || !window.db) {
-            loadDemoNotes();
-            return;
-        }
-        
-        window.DOM.loadingIndicator.classList.remove('hidden');
-        window.db.collection("notas").orderBy("fecha", "desc").onSnapshot((snapshot) => {
-            window.allNotes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            renderNotes(window.allNotes); 
-            window.DOM.loadingIndicator.classList.add('hidden');
+        DOM.loadingIndicator.classList.remove('hidden');
+        // Ordenar por fecha para asegurar el orden correcto
+        db.collection("notas").orderBy("fecha", "desc").onSnapshot((snapshot) => {
+            allNotes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            renderNotes(allNotes); 
+            DOM.loadingIndicator.classList.add('hidden');
         }, (error) => {
             console.error("Error al cargar las notas: ", error);
             showToast("Error al cargar las notas.", "error");
-            window.DOM.loadingIndicator.classList.add('hidden');
-            loadDemoNotes();
+            DOM.loadingIndicator.classList.add('hidden');
         });
-    }
-    
-    function loadDemoNotes() {
-        window.DOM.loadingIndicator.classList.remove('hidden');
-        
-        setTimeout(() => {
-            window.allNotes = [
-                {
-                    id: 'demo1',
-                    titulo: 'Nota de demostración 1',
-                    descripcion: 'Esta es una nota de demostración para mostrar cómo funciona la aplicación sin Firebase.',
-                    fecha: { seconds: Math.floor(Date.now() / 1000) },
-                    attachments: []
-                },
-                {
-                    id: 'demo2',
-                    titulo: 'Nota de demostración 2',
-                    descripcion: 'Puedes añadir, editar y eliminar notas en este modo de demostración, pero los cambios no se guardarán permanentemente.',
-                    fecha: { seconds: Math.floor(Date.now() / 1000) - 3600 },
-                    attachments: []
-                }
-            ];
-            renderNotes(window.allNotes);
-            window.DOM.loadingIndicator.classList.add('hidden');
-            showToast("Funcionando en modo demostración. Los cambios no se guardarán permanentemente.", "error");
-        }, 1000);
     }
 
     async function saveNote() {
-        const title = window.DOM.noteTitleInput.value.trim();
-        const content = window.DOM.noteContentInput.value.trim();
-        const noteId = window.DOM.noteIdToEdit.value;
+        const title = DOM.noteTitleInput.value.trim();
+        const content = DOM.noteContentInput.value.trim();
+        const noteId = DOM.noteIdToEdit.value;
 
         if (title === '' || content === '') {
             showToast('El título y el contenido son obligatorios.', 'error');
             return;
         }
 
-        window.DOM.saveNoteButton.disabled = true;
-        window.DOM.saveNoteButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Guardando...';
+        DOM.saveNoteButton.disabled = true;
+        DOM.saveNoteButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Guardando...';
 
         try {
             let finalAttachments = [];
 
             if (noteId) {
-                const existingNote = window.allNotes.find(n => n.id === noteId);
+                // Editando una nota existente
+                const existingNote = allNotes.find(n => n.id === noteId);
                 const existingAttachments = existingNote.attachments || [];
 
+                // Identificar archivos a eliminar (los que estaban y ya no están en la selección actual)
                 const filesToDelete = existingAttachments.filter(existingAtt =>
-                    !window.currentSelectedFiles.some(selectedFile =>
-                        selectedFile.name === existingAtt.name && selectedFile.isExisting
+                    !currentSelectedFiles.some(selectedFile =>
+                        selectedFile.name === existingAtt.name && selectedFile.isExisting // Solo eliminar si no está en la selección actual Y era un archivo existente
                     )
                 );
 
-                if (window.firebaseLoaded && window.storage) {
-                    for (const attToDelete of filesToDelete) {
-                        if (attToDelete.path) {
-                            const oldStorageRef = window.storage.ref(attToDelete.path);
-                            await oldStorageRef.delete().catch(err => console.warn("Archivo antiguo no encontrado o no pudo ser eliminado.", err));
-                        }
+                for (const attToDelete of filesToDelete) {
+                    if (attToDelete.path) {
+                        const oldStorageRef = storage.ref(attToDelete.path);
+                        await oldStorageRef.delete().catch(err => console.warn("Archivo antiguo no encontrado o no pudo ser eliminado.", err));
                     }
                 }
 
-                const newFilesToUpload = window.currentSelectedFiles.filter(selectedFile => !selectedFile.isExisting);
+                // Identificar nuevos archivos a subir (los que están en la selección actual y no estaban antes, es decir, no tienen isExisting: true)
+                const newFilesToUpload = currentSelectedFiles.filter(selectedFile => !selectedFile.isExisting);
                 const uploadedNewAttachments = await uploadFiles(newFilesToUpload);
 
-                const unchangedExistingAttachments = window.currentSelectedFiles.filter(selectedFile => selectedFile.isExisting);
+                // Mantener los adjuntos existentes que todavía están seleccionados
+                const unchangedExistingAttachments = currentSelectedFiles.filter(selectedFile => selectedFile.isExisting);
 
                 finalAttachments = [...unchangedExistingAttachments, ...uploadedNewAttachments];
 
             } else {
-                if (window.currentSelectedFiles.length > 0) {
-                    finalAttachments = await uploadFiles(window.currentSelectedFiles);
+                // Añadiendo nueva nota
+                if (currentSelectedFiles.length > 0) {
+                    finalAttachments = await uploadFiles(currentSelectedFiles);
                 }
             }
 
             const noteData = { 
                 titulo: title,
                 descripcion: content,
-                attachments: finalAttachments,
-                fecha: window.firebaseLoaded ? firebase.firestore.Timestamp.fromDate(new Date()) : { seconds: Math.floor(Date.now() / 1000) }
+                attachments: finalAttachments, // Guardar el array de adjuntos
+                fecha: firebase.firestore.Timestamp.fromDate(new Date())
             };
 
             if (noteId) {
-                if (window.firebaseLoaded && window.db) {
-                    await window.db.collection("notas").doc(noteId).update(noteData);
-                } else {
-                    // Modo demostración: actualizar en el array local
-                    const index = window.allNotes.findIndex(n => n.id === noteId);
-                    if (index !== -1) {
-                        window.allNotes[index] = { ...window.allNotes[index], ...noteData };
-                        renderNotes(window.allNotes);
-                    }
-                }
+                await db.collection("notas").doc(noteId).update(noteData);
                 showToast("Item actualizado.", "success");
             } else {
-                if (window.firebaseLoaded && window.db) {
-                    await window.db.collection("notas").add(noteData);
-                } else {
-                    // Modo demostración: añadir al array local
-                    const newNote = { 
-                        ...noteData, 
-                        id: 'demo_' + Date.now() 
-                    };
-                    window.allNotes.unshift(newNote);
-                    renderNotes(window.allNotes);
-                }
+                await db.collection("notas").add(noteData);
                 showToast("Item añadido.", "success");
             }
             toggleModal('addNoteModal', false);
@@ -983,8 +643,8 @@
             console.error("Error al guardar la nota:", error);
             showToast("No se pudo guardar la nota. Revisa la consola para más detalles.", "error");
         } finally {
-            window.DOM.saveNoteButton.disabled = false;
-            window.DOM.saveNoteButton.innerHTML = 'Guardar Item';
+            DOM.saveNoteButton.disabled = false;
+            DOM.saveNoteButton.innerHTML = 'Guardar Item';
         }
     }
 
@@ -994,47 +654,44 @@
     
     async function deleteNote(noteId) {
         try {
-            if (window.firebaseLoaded && window.db) {
-                const noteRef = window.db.collection("notas").doc(noteId);
-                const noteDoc = await noteRef.get();
-                if (noteDoc.exists) {
-                    const noteData = noteDoc.data();
-                    if (noteData.attachments && noteData.attachments.length > 0) {
-                        for (const attachment of noteData.attachments) {
-                            if (attachment.path) {
-                                const storageRef = window.storage.ref(attachment.path);
-                                await storageRef.delete().catch(err => console.warn("Archivo adjunto no encontrado o no pudo ser eliminado del almacenamiento.", err));
-                            }
+            const noteRef = db.collection("notas").doc(noteId);
+            const noteDoc = await noteRef.get();
+            if (noteDoc.exists) {
+                const noteData = noteDoc.data();
+                // Eliminar todos los adjuntos de Storage si existen
+                if (noteData.attachments && noteData.attachments.length > 0) {
+                    for (const attachment of noteData.attachments) {
+                        if (attachment.path) {
+                            const storageRef = storage.ref(attachment.path);
+                            await storageRef.delete().catch(err => console.warn("Archivo adjunto no encontrado o no pudo ser eliminado del almacenamiento.", err));
                         }
                     }
                 }
-                await noteRef.delete();
-            } else {
-                // Modo demostración: eliminar del array local
-                window.allNotes = window.allNotes.filter(note => note.id !== noteId);
-                renderNotes(window.allNotes);
             }
+            await noteRef.delete();
             showToast("Nota eliminada.", "success");
         } catch (error) {
             console.error("Error al eliminar la nota: ", error);
-            showToast('No se pudo eliminar la nota.', "error");
+            showToast('No se pudo eliminar la nota.', 'error');
         }
     }
 
+    // --- RENDERING & UI ---
     function renderNotes(notes) {
-        window.DOM.notesContainer.innerHTML = '';
-        window.DOM.noResultsMessage.classList.toggle('hidden', notes.length > 0 || window.DOM.searchInput.value === '');
-        window.DOM.noNotesMessage.classList.toggle('hidden', window.allNotes.length > 0);
+        DOM.notesContainer.innerHTML = '';
+        DOM.noResultsMessage.classList.toggle('hidden', notes.length > 0 || DOM.searchInput.value === '');
+        DOM.noNotesMessage.classList.toggle('hidden', allNotes.length > 0);
         notes.forEach(note => {
             const noteElement = document.createElement('div');
             noteElement.className = 'note-card bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex flex-col';
 
+            // Generar HTML para múltiples adjuntos
             const attachmentsHTML = (note.attachments && note.attachments.length > 0)
                 ? note.attachments.map(att => `
                     <a href="${att.url}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-sm text-blue-600 hover:underline mt-1">
                         <i class="fas fa-paperclip"></i><span>${escapeHTML(att.name || 'Adjunto')}</span>
                     </a>
-                `).join('<br>')
+                `).join('<br>') // Añadir un salto de línea entre adjuntos para que se muestren verticalmente
                 : '';
 
             const date = note.fecha ? new Date(note.fecha.seconds * 1000).toLocaleString() : 'N/A';
@@ -1042,35 +699,36 @@
                 <div class="flex-grow">
                     <div class="flex justify-between items-start mb-2">
                         <h3 class="text-xl font-bold text-gray-900 pr-4">${escapeHTML(note.titulo)}</h3>
+                        <p class="text-gray-600 whitespace-pre-wrap mb-4">${escapeHTML(note.descripcion)}</p>
                         <div class="flex items-center gap-3">
                             <button data-id="${note.id}" class="edit-note-btn text-gray-400 hover:text-blue-500"><i class="fas fa-pencil-alt"></i></button>
                             <button data-id="${note.id}" class="delete-note-btn text-gray-400 hover:text-red-500"><i class="fas fa-trash-alt"></i></button>
                         </div>
                     </div>
-                    <p class="text-gray-600 whitespace-pre-wrap mb-4">${escapeHTML(note.descripcion)}</p>
                 </div>
                 <div>
                     ${attachmentsHTML}
                     <div class="text-right text-xs text-gray-400 mt-4">${date}</div>
                 </div>`;
-            window.DOM.notesContainer.appendChild(noteElement);
+            DOM.notesContainer.appendChild(noteElement);
         });
         document.querySelectorAll('.delete-note-btn').forEach(b => b.addEventListener('click', (e) => { e.stopPropagation(); confirmDelete(e.currentTarget.dataset.id); }));
-        document.querySelectorAll('.edit-note-btn').forEach(b => b.addEventListener('click', (e) => { e.stopPropagation(); const note = window.allNotes.find(n=>n.id===e.currentTarget.dataset.id); if(note) openEditModal(note); }));
+        document.querySelectorAll('.edit-note-btn').forEach(b => b.addEventListener('click', (e) => { e.stopPropagation(); const note = allNotes.find(n=>n.id===e.currentTarget.dataset.id); if(note) openEditModal(note); }));
     }
 
     function filterNotes(searchTerm) {
         const term = searchTerm.toLowerCase();
-        window.DOM.searchInput.value = term;
-        window.DOM.mainSearchInput.value = term;
-        const filtered = window.allNotes.filter(n => 
+        DOM.searchInput.value = term;
+        DOM.mainSearchInput.value = term;
+        const filtered = allNotes.filter(n => 
             n.titulo.toLowerCase().includes(term) || 
             n.descripcion.toLowerCase().includes(term) || 
-            (n.attachments && n.attachments.some(att => att.name.toLowerCase().includes(term)))
+            (n.attachments && n.attachments.some(att => att.name.toLowerCase().includes(term))) // Buscar en nombres de adjuntos
         );
         renderNotes(filtered);
     }
     
+    // --- UTILITIES ---
     function escapeHTML(str) { 
         const div = document.createElement('div');
         div.appendChild(document.createTextNode(str));
@@ -1078,11 +736,12 @@
     }
 
     function showConfirmationModal(message, onConfirmCallback) {
-        window.DOM.confirmationMessage.textContent = message;
-        const newConfirmButton = window.DOM.confirmButton.cloneNode(true);
-        window.DOM.confirmButton.parentNode.replaceChild(newConfirmButton, window.DOM.confirmButton);
-        window.DOM.confirmButton = newConfirmButton;
-        window.DOM.confirmButton.onclick = () => { toggleModal('confirmationModal', false); onConfirmCallback(); };
+        DOM.confirmationMessage.textContent = message;
+        // Clonar el botón para eliminar listeners anteriores
+        const newConfirmButton = DOM.confirmButton.cloneNode(true);
+        DOM.confirmButton.parentNode.replaceChild(newConfirmButton, DOM.confirmButton);
+        DOM.confirmButton = newConfirmButton;
+        DOM.confirmButton.onclick = () => { toggleModal('confirmationModal', false); onConfirmCallback(); };
         toggleModal('confirmationModal', true);
     }
 
@@ -1090,7 +749,7 @@
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
         toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle'} mr-3"></i> ${message}`;
-        window.DOM.toastContainer.appendChild(toast);
+        DOM.toastContainer.appendChild(toast);
         setTimeout(() => toast.classList.add('show'), 10);
         setTimeout(() => {
             toast.classList.remove('show');
