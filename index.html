@@ -214,7 +214,7 @@
   </main>
 </div>
 
-<!-- Modales (sin cambios estructurales, pero se aseguran de funcionar con el nuevo layout) -->
+<!-- Modales -->
 <div class="modal fixed inset-0 bg-gray-900 bg-opacity-75 items-center justify-center p-4 z-50 overflow-y-auto" id="addNoteModal">
     <div class="modal-content bg-white rounded-xl shadow-2xl w-full max-w-2xl transform transition-all">
         <div class="flex justify-between items-center p-5 border-b border-gray-200"><h3 class="text-2xl font-bold text-gray-800" id="modalTitle">Añadir Nuevo Item</h3><button class="modal-close text-gray-400 hover:text-gray-600" data-modal="addNoteModal"><i class="fas fa-times fa-2x"></i></button></div>
@@ -243,8 +243,8 @@
         <div class="flex justify-between items-center p-5 border-b border-gray-200"><h3 class="text-2xl font-bold text-gray-800">Recursos</h3><button class="modal-close text-gray-400 hover:text-gray-600" data-modal="mfcModal"><i class="fas fa-times fa-2x"></i></button></div>
         <div class="p-6">
             <ul class="space-y-4">
-                <li><a class="flex items-center gap-3 text-blue-600 hover:text-blue-800 hover:underline" download href="https://firebasestorage.googleapis.com/..."><i class="fas fa-file-archive fa-fw text-lg"></i><span class="font-medium">MFC.msi</span></a></li>
-                <li><a class="flex items-center gap-3 text-blue-600 hover:text-blue-800 hover:underline" download href="https://firebasestorage.googleapis.com/..."><i class="fas fa-file-code fa-fw text-lg"></i><span class="font-medium">mfc.exe</span></a></li>
+                <li><a class="flex items-center gap-3 text-blue-600 hover:text-blue-800 hover:underline" download href="#"><i class="fas fa-file-archive fa-fw text-lg"></i><span class="font-medium">MFC.msi</span></a></li>
+                <li><a class="flex items-center gap-3 text-blue-600 hover:text-blue-800 hover:underline" download href="#"><i class="fas fa-file-code fa-fw text-lg"></i><span class="font-medium">mfc.exe</span></a></li>
                 <li><a class="flex items-center gap-3 text-green-600 hover:text-green-800 hover:underline" href="https://mfc.maquelsa.com/mfc3/access.php" rel="noopener noreferrer" target="_blank"><i class="fas fa-external-link-alt fa-fw text-lg"></i><span class="font-medium">Acceso Web 1 (Maquelsa)</span></a></li>
                 <li><a class="flex items-center gap-3 text-green-600 hover:text-green-800 hover:underline" href="https://mirror1.infodesain.com/nodeprint/access.php" rel="noopener noreferrer" target="_blank"><i class="fas fa-external-link-alt fa-fw text-lg"></i><span class="font-medium">Acceso Web 2 (Mirror)</span></a></li>
             </ul>
@@ -267,30 +267,22 @@
 
     function checkPIN() {
         const pin = document.getElementById("pinInput").value;
-        // ADVERTENCIA: Esta comprobación es INSEGURA. El PIN es visible en el código fuente.
-        // Usar solo para propósitos de demostración.
         if (pin === "2548") {
             document.getElementById("pinScreenContainer").style.display = "none";
             document.getElementById("appContent").style.display = "block";
-            // Inicializar la app de Firebase SOLO después de que el PIN sea correcto
             initializeApp(); 
         } else {
             const errorMsg = document.getElementById("errorMsg");
             errorMsg.classList.remove("hidden");
-            // Opcional: hacer que el input tiemble para dar feedback
             const pinScreen = document.getElementById("pinScreen");
-            pinScreen.classList.add('animate-shake'); // Necesitarías una animación CSS para 'shake'
+            pinScreen.classList.add('animate-shake');
             setTimeout(() => pinScreen.classList.remove('animate-shake'), 500);
         }
     }
 
     function logoutApp() {
-        document.getElementById("appContent").style.display = "none";
-        document.getElementById("pinScreenContainer").style.display = "flex";
-        document.getElementById("pinInput").value = "";
-        document.getElementById("errorMsg").classList.add("hidden");
-        // Opcional: recargar la página para limpiar el estado completamente
-        // window.location.reload(); 
+        // En modo anónimo, recargar la página es la forma más simple de "cerrar sesión"
+        window.location.reload();
     }
 </script>
 
@@ -298,44 +290,57 @@
 <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-storage-compat.js"></script>
+<!-- AÑADIDO: Script de autenticación necesario -->
+<script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth-compat.js"></script>
+
 <script>
     // --- LÓGICA PRINCIPAL DE LA APLICACIÓN ---
 
-    // ⚠️ ADVERTENCIA DE SEGURIDAD MUY IMPORTANTE ⚠️
-    // NUNCA expongas tus claves de API en el código del lado del cliente.
-    // Cualquiera puede verlas y usarlas para acceder a tu proyecto de Firebase.
-    // Utiliza variables de entorno y un sistema de backend o Firebase Hosting para configurarlas de forma segura.
     const firebaseConfig = {
-        apiKey: "TU_API_KEY_AQUI", // <-- REEMPLAZA Y PROTEGE
+        apiKey: "TU_API_KEY_AQUI",
         authDomain: "TU_AUTH_DOMAIN_AQUI",
-        projectId: "mikelaneako", // <-- REEMPLAZA
+        projectId: "mikelaneako",
         storageBucket: "TU_STORAGE_BUCKET_AQUI",
         messagingSenderId: "TU_SENDER_ID_AQUI",
         appId: "TU_APP_ID_AQUI"
     };
 
-    let db, storage;
+    // MODIFICADO: Añadida la variable `auth`
+    let db, storage, auth;
     let allNotes = [];
     let DOM = {};
-    let currentSelectedFiles = []; // Almacena archivos para subida (nuevos o existentes)
+    let currentSelectedFiles = [];
 
-    // Esta función se llama después de introducir el PIN correcto.
+    // MODIFICADO: La función ahora incluye la autenticación anónima
     function initializeApp() {
-        if (firebase.apps.length === 0) { // Evita reinicializar Firebase
+        if (firebase.apps.length === 0) {
             firebase.initializeApp(firebaseConfig);
             db = firebase.firestore();
             storage = firebase.storage();
+            auth = firebase.auth(); // Inicializa el servicio de autenticación
         }
         
-        initializeDOMElements();
-        setupEventListeners();
-        
-        // Simular inicio de sesión anónimo si es necesario, o manejar la autenticación real
-        // Aquí asumimos que el acceso está "garantizado" por el PIN (aunque sea inseguro)
-        DOM.appHeader.classList.remove('hidden');
-        DOM.appMain.classList.remove('hidden');
-        showView('search');
-        loadNotes();
+        // Inicia sesión de forma anónima para obtener permisos de escritura/lectura
+        auth.signInAnonymously()
+            .then(() => {
+                console.log("Usuario autenticado anónimamente con éxito.");
+
+                // Evita volver a añadir event listeners si la función se llama de nuevo por error
+                if (!Object.keys(DOM).length) {
+                    initializeDOMElements();
+                    setupEventListeners();
+                }
+                
+                // Muestra la aplicación y carga los datos
+                DOM.appHeader.classList.remove('hidden');
+                DOM.appMain.classList.remove('hidden');
+                showView('search');
+                loadNotes();
+            })
+            .catch((error) => {
+                console.error("Error al autenticar anónimamente:", error);
+                showToast("Fallo de autenticación. No se podrán guardar datos.", "error");
+            });
     }
     
     function initializeDOMElements() {
@@ -395,7 +400,6 @@
         DOM.noteAttachmentInput.addEventListener('change', handleFileSelect);
         DOM.cancelButton.addEventListener('click', () => toggleModal('confirmationModal', false));
 
-        // Dropdown de búsqueda web
         DOM.webSearchDropdownBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             DOM.webSearchDropdownMenu.classList.toggle('active');
@@ -408,11 +412,9 @@
             }
         });
 
-        // Menú móvil
         DOM.menuToggleBtn.addEventListener('click', () => DOM.mobileMenu.classList.add('active'));
         DOM.closeMobileMenuBtn.addEventListener('click', () => DOM.mobileMenu.classList.remove('active'));
         
-        // Cierra el menú móvil al hacer clic en una opción
         const closeMobileMenu = () => DOM.mobileMenu.classList.remove('active');
         DOM.mobileViewAllButton.addEventListener('click', () => { DOM.viewAllButton.click(); closeMobileMenu(); });
         DOM.mobileAddItemButton.addEventListener('click', () => { openAddModal(); closeMobileMenu(); });
@@ -423,7 +425,7 @@
     function showView(viewName) {
         DOM.mainSearchView.classList.toggle('hidden', viewName !== 'search');
         DOM.allItemsView.classList.toggle('hidden', viewName !== 'items');
-        window.scrollTo(0, 0); // Vuelve al inicio de la página al cambiar de vista
+        window.scrollTo(0, 0);
     }
 
     function toggleModal(modalId, show) {
@@ -450,10 +452,10 @@
                 searchUrl = `https://www.google.com/search?q=${encodeURIComponent(searchTerm)}+site:copytechnet.com`;
             } else if (type === 'printcopy') {
                 searchUrl = `https://www.google.com/search?q=${encodeURIComponent(searchTerm)}+site:printcopy.info`;
-            } else { // 'google'
+            } else { 
                 searchUrl = `https://www.google.com/search?q=${encodeURIComponent(searchTerm)}`;
             }
-            window.open(searchUrl, '_blank'); // Abrir en nueva pestaña
+            window.open(searchUrl, '_blank');
         }
     }
     
@@ -506,7 +508,6 @@
                 const existingNote = allNotes.find(n => n.id === noteId);
                 const attachmentsToKeep = currentSelectedFiles.filter(file => file.isExisting);
                 
-                // Identificar y eliminar archivos antiguos de Storage
                 const oldAttachments = existingNote.attachments || [];
                 const filesToDelete = oldAttachments.filter(oldAtt => 
                     !attachmentsToKeep.some(keepAtt => keepAtt.path === oldAtt.path)
@@ -537,7 +538,7 @@
             toggleModal('addNoteModal', false);
         } catch (error) {
             console.error("Error al guardar el item:", error);
-            showToast("No se pudo guardar el item.", "error");
+            showToast("No se pudo guardar el item. Revisa las reglas de seguridad de Firebase.", "error");
         } finally {
             DOM.saveNoteButton.disabled = false;
             DOM.saveNoteButton.innerHTML = 'Guardar Item';
@@ -666,7 +667,6 @@
             DOM.notesContainer.appendChild(noteElement);
         });
 
-        // Asignar eventos a los botones recién creados
         DOM.notesContainer.querySelectorAll('.delete-note-btn').forEach(b => b.addEventListener('click', (e) => confirmDelete(e.currentTarget.dataset.id)));
         DOM.notesContainer.querySelectorAll('.edit-note-btn').forEach(b => b.addEventListener('click', (e) => {
             const noteToEdit = allNotes.find(n => n.id === e.currentTarget.dataset.id);
