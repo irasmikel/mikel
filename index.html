@@ -2,722 +2,919 @@
 <html lang="es">
 <head>
 <meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Acceso Seguro</title>
+
+<!-- 1️⃣  Manifest & favicons (PWA)<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="theme-color" content="#4f46e5">
+
+<!-- 2️⃣  CSS y fuentes -->
 <script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
-<link crossorigin="anonymous" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" referrerpolicy="no-referrer" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"/>
+<link crossorigin="anonymous"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      referrerpolicy="no-referrer"
+      rel="stylesheet"/>
+
 <style>
-  body { 
-    font-family: 'Inter', sans-serif; 
-    background-color: #f8f9fa; 
+  /* ==== RESPONSIVE ==== */
+  @media (max-width: 768px) {
+    .note-card { flex-direction: column !important; align-items: flex-start !important; }
+    .note-card .items-end { align-self: flex-end; margin-top: 1rem; }
+    #pinScreen { padding: 2rem; }
   }
-  .main-search-container { 
-    min-height: calc(100vh - 200px); 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
+  body {font-family: 'Inter', sans-serif; background-color:#f8f9fa;}
+  .main-search-container{min-height:calc(100vh - 200px);display:flex;align-items:center;justify-content:center;}
+  .tag{
+    background-color:#4f46e5;color:#fff;padding:.25rem .6rem;border-radius:9999px;
+    font-size:.8rem;font-weight:500;display:inline-flex;align-items:center;gap:.25rem;
+    transition:all .2s ease-in-out;background-image:linear-gradient(to right,#4f46e5,#8b5cf6);
   }
-  .note-card { 
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; 
+  .tag:hover{transform:scale(1.05);box-shadow:0 4px 6px -1px rgba(0,0,0,.1),0 2px 4px -2px rgba(0,0,0,.1);}
+  .note-card{transition:transform .2s ease-in-out,box-shadow .2s ease-in-out;}
+  .note-card:hover{transform:translateY(-5px);box-shadow:0 10px 15px -3px rgb(0 0 0 / .07),0 4px 6px -4px rgb(0 0 0 / .07);}
+  .modal{display:none;opacity:0;transition:opacity .3s ease;}
+  .modal.active{display:flex;opacity:1;}
+  .modal-content{transform:scale(.95);transition:transform .3s ease;}
+  .modal.active .modal-content{transform:scale(1);}
+  input[type="file"]{display:none;}
+  #toast-container{position:fixed;top:20px;right:20px;z-index:100;}
+  .toast{
+    display:flex;align-items:center;padding:1rem 1.5rem;border-radius:.5rem;
+    box-shadow:0 4px 6px -1px rgba(0,0,0,.1),0 2px 4px -2px rgba(0,0,0,.1);
+    opacity:0;transform:translateX(100%);transition:all .3s ease-in-out;
   }
-  .note-card:hover { 
-    transform: translateY(-5px); 
-    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.07), 0 4px 6px -4px rgb(0 0 0 / 0.07); 
+  .toast.show{opacity:1;transform:translateX(0);}
+  .toast.success{background-color:#d1fae5;color:#065f46;}
+  .toast.error{background-color:#fee2e2;color:#991b1b;}
+  .mobile-drawer{
+    transition:transform .3s ease-in-out;
+    transform:translateX(100%);
   }
-  .modal { 
-    display: none; 
-    opacity: 0; 
-    transition: opacity 0.3s ease; 
+  .mobile-drawer.active{
+    transform:translateX(0);
   }
-  .modal.active { 
-    display: flex; 
-    opacity: 1; 
-  }
-  .modal-content { 
-    transform: scale(0.95); 
-    transition: transform 0.3s ease; 
-  }
-  .modal.active .modal-content { 
-    transform: scale(1); 
-  }
-  input[type="file"] { 
-    display: none; 
-  }
-  #toast-container { 
-    position: fixed; 
-    top: 20px; 
-    right: 20px; 
-    z-index: 1050; /* Aumentado para estar sobre los modales */
-  }
-  .toast { 
-    display: flex; 
-    align-items: center; 
-    padding: 1rem 1.5rem; 
-    border-radius: 0.5rem; 
-    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); 
-    opacity: 0; 
-    transform: translateX(100%); 
-    transition: all 0.3s ease-in-out; 
-  }
-  .toast.show { 
-    opacity: 1; 
-    transform: translateX(0); 
-  }
-  .toast.success { background-color: #d1fae5; color: #065f46; }
-  .toast.error { background-color: #fee2e2; color: #991b1b; }
-  .mobile-menu {
-    transition: transform 0.3s ease-in-out;
-    transform: translateX(100%);
-    z-index: 1040;
-  }
-  .mobile-menu.active {
-    transform: translateX(0);
-  }
-  .dropdown-menu {
-    display: none;
-  }
-  .dropdown-menu.active {
-    display: block;
-  }
+  .dropdown-menu{display:none;}
+  .dropdown-menu.active{display:block;}
 </style>
 </head>
-<body class="bg-gray-100">
 
-<!-- Pantalla de carga -->
-<div class="fixed inset-0 flex items-center justify-center bg-white z-[1060]" id="loader">
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+
+<!-- ==== LOGOUT (desktop) ==== -->
+<div class="hidden md:block fixed top-4 right-4 z-50">
+  <button class="text-gray-700 bg-white p-2 rounded shadow-md hover:bg-gray-100"
+          onclick="logoutApp()"><i class="fas fa-sign-out-alt"></i></button>
+</div>
+
+<!-- ==== MENU HAMBURGUESA (mobile) ==== -->
+<div class="md:hidden fixed top-4 left-4 z-50">
+  <button class="text-gray-700 bg-white p-2 rounded shadow-md"
+          onclick="toggleMobileDrawer()"><i class="fas fa-bars fa-lg"></i></button>
+</div>
+
+<!-- ==== DRAWER MOBILE (renombrado para evitar conflicto) ==== -->
+<div id="mobileDrawer" class="fixed inset-y-0 left-0 w-64 bg-white shadow-lg p-6 z-50 mobile-drawer hidden md:hidden">
+  <div class="flex justify-between items-center mb-6">
+    <h3 class="text-xl font-bold">Menú</h3>
+    <button class="text-gray-700 text-2xl" onclick="toggleMobileDrawer()"><i class="fas fa-times"></i></button>
+  </div>
+  <div class="flex flex-col space-y-4">
+    <button class="w-full text-left px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-100"
+            id="mobileViewAllButton"><i class="fa-solid fa-list"></i> Ver Todo</button>
+    <button class="w-full text-left px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-100"
+            id="mobileMfcButton"><i class="fa-solid fa-download"></i> Recursos</button>
+    <button class="w-full text-left px-4 py-2 text-sm font-medium text-white bg-gray-800 rounded-md hover:bg-gray-900"
+            id="mobileAddItemButton"><i class="fa-solid fa-plus"></i> Añadir Item</button>
+  </div>
+</div>
+
+<!-- ==== CARGADOR (sólo una vez) ==== -->
+<div id="loader" class="fixed inset-0 flex items-center justify-center bg-white z-50">
   <div class="text-center space-y-4">
-    <svg class="animate-spin h-10 w-10 text-blue-600 mx-auto" fill="none" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-      <path class="opacity-75" d="M4 12a8 8 0 018-8v8z" fill="currentColor"></path>
+    <svg class="animate-spin h-10 w-10 text-blue-600 mx-auto" fill="none"
+         viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <circle class="opacity-25" cx="12" cy="12" r="10"
+              stroke="currentColor" stroke-width="4"></circle>
+      <path class="opacity-75" d="M4 12a8 8 0 018-8v8z"
+            fill="currentColor"></path>
     </svg>
     <p class="text-gray-700 text-lg font-medium">Cargando…</p>
   </div>
 </div>
 
-<!-- Pantalla de PIN -->
-<div class="flex items-center justify-center h-screen" id="pinScreenContainer">
-  <div class="text-center space-y-6 p-8" id="pinScreen">
-    <h1 class="text-2xl font-bold">Introduce el PIN para acceder</h1>
-    <input class="px-4 py-2 border rounded text-center text-xl" id="pinInput" maxlength="4" placeholder="PIN" type="password"/>
-    <div>
-      <button class="mt-4 bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700" onclick="checkPIN()">Entrar</button>
-    </div>
-    <p class="text-red-500 font-medium hidden" id="errorMsg">PIN incorrecto</p>
+<!-- ==== PIN SCREEN ==== -->
+<div id="pinScreen" class="text-center space-y-6">
+  <h1 class="text-2xl font-bold">Introduce el PIN para acceder</h1>
+  <input id="pinInput" maxlength="4" placeholder="PIN"
+         type="password"
+         class="px-4 py-2 border rounded text-center text-xl"/>
+  <div>
+    <button class="mt-4 bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+            onclick="checkPIN()">Entrar</button>
   </div>
+  <p id="errorMsg" class="text-red-500 font-medium hidden">PIN incorrecto</p>
 </div>
 
+<!-- ==== APP CONTENT (oculto hasta pasar PIN) ==== -->
+<div id="appContent" style="display:none;">
 
-<!-- Contenido principal de la aplicación -->
-<div id="appContent" style="display: none;">
-  <!-- Header -->
-  <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-40 border-b border-gray-200" id="app-header">
+  <!-- -------- HEADER -------- -->
+  <header id="app-header"
+          class="bg-white/80 backdrop-blur-lg sticky top-0 z-40 border-b border-gray-200 hidden">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-16">
         <div class="flex items-center">
-          <button class="flex items-center gap-2 text-xl font-bold text-gray-800" id="logoButton">
-            <span class="bg-gray-800 text-white rounded-md w-7 h-7 flex items-center justify-center"><i class="fa-solid fa-plus"></i></span> Mikel
+          <button id="logoButton"
+                  class="flex items-center gap-2 text-xl font-bold text-gray-800">
+            <span class="bg-gray-800 text-white rounded-md w-7 h-7 flex items-center justify-center">
+              <i class="fa-solid fa-plus"></i>
+            </span> Mikel
           </button>
         </div>
-        <!-- Menú de escritorio -->
+        <!-- NAV (desktop) -->
         <nav class="hidden md:flex items-center gap-3">
-          <button class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50" id="viewAllButton">
+          <button id="viewAllButton"
+                  class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
             <i class="fa-solid fa-list"></i> Ver Todo
           </button>
-          <button class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50" id="mfcButton">
+          <button id="mfcButton"
+                  class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
             <i class="fa-solid fa-download"></i> Recursos
           </button>
-          <button class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-gray-800 rounded-md hover:bg-gray-900" id="addItemButtonHeader">
+          <button id="addItemButtonHeader"
+                  class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-gray-800 rounded-md hover:bg-gray-900">
             <i class="fa-solid fa-plus"></i> Añadir Item
           </button>
         </nav>
-        <!-- Botón de logout (Escritorio) -->
-        <button class="hidden md:block text-gray-700 bg-white p-2 rounded shadow-md hover:bg-gray-100" onclick="logoutApp()">
-          <i class="fas fa-sign-out-alt"></i>
-        </button>
-        <!-- Botón hamburguesa (Móvil) -->
-        <button class="md:hidden text-gray-700 text-2xl" id="menuToggleBtn">
-          <i class="fas fa-bars"></i>
-        </button>
+        <!-- HAMBURGER (mobile) -->
+        <button id="menuToggleBtn"
+                class="md:hidden text-gray-700 text-2xl"><i class="fas fa-bars"></i></button>
       </div>
     </div>
   </header>
 
-  <!-- Menú lateral para móvil -->
-  <div class="fixed top-0 right-0 h-full w-64 bg-white shadow-lg p-6 mobile-menu md:hidden" id="mobileMenu">
-      <div class="flex justify-between items-center mb-6">
-          <h3 class="text-xl font-bold">Menú</h3>
-          <button class="text-gray-700 text-2xl" id="closeMobileMenuBtn"><i class="fas fa-times"></i></button>
-      </div>
-      <div class="flex flex-col space-y-4">
-          <button class="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md" id="mobileViewAllButton">
-              <i class="fa-solid fa-list fa-fw"></i> Ver Todo
-          </button>
-          <button class="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md" id="mobileMfcButton">
-              <i class="fa-solid fa-download fa-fw"></i> Recursos
-          </button>
-          <button class="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md" id="mobileAddItemButton">
-              <i class="fa-solid fa-plus fa-fw"></i> Añadir Item
-          </button>
-          <div class="border-t my-4"></div>
-          <button class="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-md" onclick="logoutApp()">
-            <i class="fas fa-sign-out-alt fa-fw"></i> Salir
-          </button>
-      </div>
-  </div>
+  <!-- -------- MAIN -------- -->
+  <main id="app-main"
+        class="container mx-auto p-4 sm:p-6 lg:p-8 hidden">
 
-  <!-- Contenido principal -->
-  <main class="container mx-auto p-4 sm:p-6 lg:p-8" id="app-main">
+    <!-- TOASTS -->
     <div id="toast-container"></div>
-    <!-- Vista de búsqueda principal -->
-    <div id="main-search-view">
+
+    <!-- ---------- SEARCH VIEW ---------- -->
+    <section id="main-search-view">
       <div class="main-search-container">
-        <div class="text-center w-full max-w-2xl px-4">
+        <div class="text-center w-full max-w-2xl">
           <div class="flex justify-center items-center gap-3 mb-6">
             <span class="bg-white border-2 border-gray-200 rounded-2xl w-16 h-16 flex items-center justify-center text-2xl"><i class="fa-solid fa-plus"></i></span>
           </div>
           <h1 class="text-5xl font-bold text-gray-800 mb-8">Mikel</h1>
-          <!-- Contenedor de búsqueda rediseñado para ser responsive -->
-          <div class="w-full space-y-3">
-              <input class="w-full pl-6 pr-4 py-4 border border-gray-200 rounded-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-lg" id="mainSearchInput" placeholder="Busca en tus notas o en la red..." type="text"/>
-              <div class="flex flex-col sm:flex-row gap-3 justify-center">
-                  <button class="w-full sm:w-auto px-6 py-3 bg-gray-800 text-white rounded-full hover:bg-gray-900 transition-colors" id="mainSearchButton">Buscar en Notas</button>
-                  <div class="relative w-full sm:w-auto">
-                      <button class="w-full flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors" id="webSearchDropdownBtn">
-                          Búsqueda Web <i class="fas fa-caret-down"></i>
-                      </button>
-                      <div class="dropdown-menu absolute right-0 mt-2 py-2 w-48 bg-white rounded-md shadow-xl z-20" id="webSearchDropdownMenu">
-                          <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" data-type="copytech" href="#">Copytechnet</a>
-                          <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" data-type="printcopy" href="#">Printcopy.info</a>
-                          <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" data-type="google" href="#">Google General</a>
-                      </div>
-                  </div>
+
+          <div class="relative w-full shadow-lg rounded-full flex">
+            <input id="mainSearchInput"
+                   placeholder="Busca en tus notas o en la red..."
+                   type="text"
+                   class="flex-grow pl-6 pr-4 py-4 border border-gray-200 rounded-l-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500"/>
+            <button id="mainSearchButton"
+                    class="px-6 bg-gray-800 text-white hover:bg-gray-900 transition-colors">Buscar</button>
+
+            <div class="relative">
+              <button id="webSearchDropdownBtn"
+                      class="px-6 bg-blue-600 text-white rounded-r-full hover:bg-blue-700 transition-colors h-full flex items-center gap-2">
+                Web <i class="fas fa-caret-down"></i>
+              </button>
+
+              <div id="webSearchDropdownMenu"
+                   class="dropdown-menu absolute right-0 mt-2 py-2 w-48 bg-white rounded-md shadow-xl z-20">
+                <a id="dropdown-copytech-btn"
+                   href="#"
+                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                   data-type="copytech">Copytechnet</a>
+                <a id="dropdown-printcopy-btn"
+                   href="#"
+                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                   data-type="printcopy">Printcopy.info</a>
+                <a id="dropdown-google-btn"
+                   href="#"
+                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                   data-type="google">Google General</a>
               </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <!-- Vista de todos los items -->
-    <div class="hidden" id="all-items-view">
-      <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-        <h2 class="text-2xl font-bold text-gray-800">Base de Conocimiento</h2>
-        <div class="relative w-full md:max-w-xs">
-          <input class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" id="searchInput" placeholder="Filtrar resultados..." type="text"/>
-          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><i class="fas fa-search text-gray-400"></i></div>
+    </section>
+
+    <!-- ---------- ALL ITEMS VIEW ---------- -->
+    <section id="all-items-view" class="hidden">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold">Base de Conocimiento</h2>
+        <div class="relative w-full max-w-xs">
+          <input id="searchInput"
+                 type="text"
+                 placeholder="Filtrar resultados..."
+                 class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"/>
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <i class="fas fa-search text-gray-400"></i>
+          </div>
         </div>
       </div>
-      <div class="text-center py-10" id="loading-indicator"><i class="fas fa-spinner fa-spin fa-3x text-blue-500"></i><p class="mt-2 text-gray-600">Cargando items...</p></div>
-      <div class="text-center py-10 bg-white rounded-lg shadow-sm hidden" id="no-notes-message"><i class="fas fa-folder-open fa-3x text-gray-400"></i><p class="mt-4 text-xl font-semibold text-gray-700">No hay items todavía.</p><p class="text-gray-500">Usa el botón "Añadir Item" para empezar.</p></div>
-      <div class="text-center py-10 bg-white rounded-lg shadow-sm hidden" id="no-results-message"><i class="fas fa-search-minus fa-3x text-gray-400"></i><p class="mt-4 text-xl font-semibold text-gray-700">No se encontraron resultados.</p><p class="text-gray-500">Prueba con otros términos de búsqueda.</p></div>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="notes-container"></div>
-    </div>
+
+      <div id="loading-indicator" class="text-center py-10">
+        <i class="fas fa-spinner fa-spin fa-3x text-blue-500"></i>
+        <p class="mt-2 text-gray-600">Cargando notas...</p>
+      </div>
+
+      <div id="no-notes-message"
+           class="text-center py-10 bg-white rounded-lg shadow-sm hidden">
+        <i class="fas fa-folder-open fa-3x text-gray-400"></i>
+        <p class="mt-4 text-xl font-semibold text-gray-700">No hay items todavía.</p>
+        <p class="text-gray-500">Usa el botón "Añadir Item" para empezar.</p>
+      </div>
+
+      <div id="no-results-message"
+           class="text-center py-10 bg-white rounded-lg shadow-sm hidden">
+        <i class="fas fa-search-minus fa-3x text-gray-400"></i>
+        <p class="mt-4 text-xl font-semibold text-gray-700">No se encontraron resultados.</p>
+        <p class="text-gray-500">Prueba con otros términos de búsqueda.</p>
+      </div>
+
+      <div id="notes-container"
+           class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    </section>
+
   </main>
 </div>
 
-<!-- Modales -->
-<div class="modal fixed inset-0 bg-gray-900 bg-opacity-75 items-center justify-center p-4 z-50 overflow-y-auto" id="addNoteModal">
-    <div class="modal-content bg-white rounded-xl shadow-2xl w-full max-w-2xl transform transition-all">
-        <div class="flex justify-between items-center p-5 border-b border-gray-200"><h3 class="text-2xl font-bold text-gray-800" id="modalTitle">Añadir Nuevo Item</h3><button class="modal-close text-gray-400 hover:text-gray-600" data-modal="addNoteModal"><i class="fas fa-times fa-2x"></i></button></div>
-        <form id="addNoteForm" onsubmit="return false;">
-            <input id="noteIdToEdit" type="hidden"/>
-            <div class="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
-                <div><label class="block text-sm font-medium text-gray-700 mb-1" for="noteTitle">Título</label><input class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500" id="noteTitle" type="text"/></div>
-                <div><label class="block text-sm font-medium text-gray-700 mb-1" for="noteContent">Contenido</label><textarea class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500" id="noteContent" rows="8"></textarea></div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Adjuntos</label>
-                    <input id="noteAttachment" type="file" multiple/>
-                    <label class="w-full cursor-pointer bg-white border border-gray-300 rounded-lg p-2 flex items-center justify-center gap-2 hover:bg-gray-50" for="noteAttachment"><i class="fas fa-upload"></i><span>Seleccionar archivos</span></label>
-                    <div class="w-full bg-gray-100 border border-gray-200 rounded-lg p-2 mt-2" id="selected-files-container">
-                        <div id="file-chosen-list" class="space-y-1"></div>
-                        <p id="no-files-selected-message" class="text-sm text-gray-500 text-center py-2">No hay archivos seleccionados.</p>
-                    </div>
-                </div>
-            </div>
-        </form>
-        <div class="bg-gray-50 p-5 flex justify-end rounded-b-xl"><button class="bg-gray-800 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-900 transition-colors flex items-center gap-2" id="saveNoteButton">Guardar Item</button></div>
+<!-- ==== MODAL ADD / EDIT NOTE ==== -->
+<div id="addNoteModal"
+     class="modal fixed inset-0 bg-gray-900 bg-opacity-75 items-center justify-center p-4 overflow-y-auto">
+  <div class="modal-content bg-white rounded-xl shadow-2xl w-full max-w-2xl">
+    <div class="flex justify-between items-center p-5 border-b border-gray-200">
+      <h3 id="modalTitle" class="text-2xl font-bold text-gray-800">Añadir Nuevo Item</h3>
+      <button class="modal-close text-gray-400 hover:text-gray-600"
+              data-modal="addNoteModal"><i class="fas fa-times fa-2x"></i></button>
     </div>
-</div>
 
-<div class="modal fixed inset-0 bg-gray-900 bg-opacity-75 items-center justify-center p-4 z-50 overflow-y-auto" id="mfcModal">
-    <div class="modal-content bg-white rounded-xl shadow-2xl w-full max-w-lg transform transition-all">
-        <div class="flex justify-between items-center p-5 border-b border-gray-200"><h3 class="text-2xl font-bold text-gray-800">Recursos</h3><button class="modal-close text-gray-400 hover:text-gray-600" data-modal="mfcModal"><i class="fas fa-times fa-2x"></i></button></div>
-        <div class="p-6">
-            <ul class="space-y-4">
-                <li><a class="flex items-center gap-3 text-blue-600 hover:text-blue-800 hover:underline" download href="#"><i class="fas fa-file-archive fa-fw text-lg"></i><span class="font-medium">MFC.msi</span></a></li>
-                <li><a class="flex items-center gap-3 text-blue-600 hover:text-blue-800 hover:underline" download href="#"><i class="fas fa-file-code fa-fw text-lg"></i><span class="font-medium">mfc.exe</span></a></li>
-                <li><a class="flex items-center gap-3 text-green-600 hover:text-green-800 hover:underline" href="https://mfc.maquelsa.com/mfc3/access.php" rel="noopener noreferrer" target="_blank"><i class="fas fa-external-link-alt fa-fw text-lg"></i><span class="font-medium">Acceso Web 1 (Maquelsa)</span></a></li>
-                <li><a class="flex items-center gap-3 text-green-600 hover:text-green-800 hover:underline" href="https://mirror1.infodesain.com/nodeprint/access.php" rel="noopener noreferrer" target="_blank"><i class="fas fa-external-link-alt fa-fw text-lg"></i><span class="font-medium">Acceso Web 2 (Mirror)</span></a></li>
-            </ul>
+    <form id="addNoteForm" onsubmit="return false;">
+      <input id="noteIdToEdit" type="hidden"/>
+      <div class="p-6 space-y-4">
+
+        <div>
+          <label for="noteTitle"
+                 class="block text-sm font-medium text-gray-700 mb-1">Título</label>
+          <input id="noteTitle"
+                 type="text"
+                 class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500"/>
         </div>
+
+        <div>
+          <label for="noteContent"
+                 class="block text-sm font-medium text-gray-700 mb-1">Contenido</label>
+          <textarea id="noteContent"
+                    rows="8"
+                    class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Adjuntos</label>
+          <input id="noteAttachment"
+                 type="file"
+                 multiple/>
+          <label for="noteAttachment"
+                 id="noteAttachmentLabel"
+                 class="w-full cursor-pointer bg-white border border-gray-300 rounded-lg p-2 flex items-center justify-center gap-2 hover:bg-gray-50">
+            <i class="fas fa-upload"></i><span>Seleccionar archivos</span>
+          </label>
+
+          <div id="selected-files-container"
+               class="w-full bg-gray-100 border border-gray-200 rounded-lg p-2 mt-2">
+            <div id="file-chosen-list" class="space-y-1"></div>
+            <p id="no-files-selected-message"
+               class="text-sm text-gray-500 text-center py-2">
+              No hay archivos seleccionados.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </form>
+
+    <div class="bg-gray-50 p-5 flex justify-end rounded-b-xl">
+      <button id="saveNoteButton"
+              class="bg-gray-800 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-900 transition-colors flex items-center gap-2">
+        Guardar Item
+      </button>
     </div>
+  </div>
 </div>
 
-<div class="modal fixed inset-0 bg-gray-900 bg-opacity-75 items-center justify-center p-4 z-50" id="confirmationModal">
-    <div class="modal-content bg-white rounded-xl shadow-2xl w-full max-w-md transform transition-all">
-        <div class="p-6 text-center"><i class="fas fa-exclamation-triangle fa-3x text-yellow-400 mb-4"></i><h3 class="text-xl font-bold text-gray-800">Confirmación Requerida</h3><p class="text-gray-600 my-4" id="confirmationMessage">¿Estás seguro?</p></div>
-        <div class="bg-gray-50 p-4 flex justify-center gap-4 rounded-b-xl"><button class="px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50" id="cancelButton">Cancelar</button><button class="px-6 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700" id="confirmButton">Confirmar</button></div>
+<!-- ==== MODAL RECURSOS ==== -->
+<div id="mfcModal"
+     class="modal fixed inset-0 bg-gray-900 bg-opacity-75 items-center justify-center p-4 overflow-y-auto">
+  <div class="modal-content bg-white rounded-xl shadow-2xl w-full max-w-lg">
+    <div class="flex justify-between items-center p-5 border-b border-gray-200">
+      <h3 class="text-2xl font-bold text-gray-800">Recursos</h3>
+      <button class="modal-close text-gray-400 hover:text-gray-600"
+              data-modal="mfcModal"><i class="fas fa-times fa-2x"></i></button>
     </div>
+
+    <div class="p-6">
+      <ul class="space-y-4">
+        <li><a class="flex items-center gap-3 text-blue-600 hover:text-blue-800 hover:underline"
+               href="https://firebasestorage.googleapis.com/v0/b/mikelaneako.firebasestorage.app/o/MFC.msi?alt=media&token=0daacbfb-75a9-4d94-87c4-ac366f8b31f7"
+               download><i class="fas fa-file-archive fa-fw text-lg"></i><span class="font-medium">MFC.msi</span></a></li>
+        <li><a class="flex items-center gap-3 text-blue-600 hover:text-blue-800 hover:underline"
+               href="https://firebasestorage.googleapis.com/v0/b/mikelaneako.firebasestorage.app/o/mfc.exe?alt=media&token=4e8a9bd2-6c55-4a54-a316-b7bad9839113"
+               download><i class="fas fa-file-code fa-fw text-lg"></i><span class="font-medium">mfc.exe</span></a></li>
+        <li><a class="flex items-center gap-3 text-green-600 hover:text-green-800 hover:underline"
+               href="https://mfc.maquelsa.com/mfc3/access.php"
+               target="_blank" rel="noopener noreferrer"><i class="fas fa-external-link-alt fa-fw text-lg"></i><span class="font-medium">Acceso Web 1 (Maquelsa)</span></a></li>
+        <li><a class="flex items-center gap-3 text-green-600 hover:text-green-800 hover:underline"
+               href="https://mirror1.infodesain.com/nodeprint/access.php"
+               target="_blank" rel="noopener noreferrer"><i class="fas fa-external-link-alt fa-fw text-lg"></i><span class="font-medium">Acceso Web 2 (Mirrorspan></a></li>
+      </ul>
+
+      <p class="mt-6 text-sm text-yellow-700 bg-yellow-100 p-3 rounded-md">
+        <i class="fas fa-exclamation-triangle mr-2"></i>
+        <strong>Importante:</strong> Los ficheros descargables son de ejemplo. Debes actualizarlos con tus propias URLs.
+      </p>
+    </div>
+  </div>
 </div>
 
+<!-- ==== MODAL CONFIRMACIÓN ==== -->
+<div id="confirmationModal"
+     class="modal fixed inset-0 bg-gray-900 bg-opacity-75 items-center justify-center p-4">
+  <div class="modal-content bg-white rounded-xl shadow-2xl w-full max-w-md">
+    <div class="p-6 text-center">
+      <i class="fas fa-exclamation-triangle fa-3x text-yellow-400 mb-4"></i>
+      <h3 class="text-xl font-bold text-gray-800">Confirmación Requerida</h3>
+      <p id="confirmationMessage" class="text-gray- my-4">¿Estás seguro?</p>
+    </div>
+    <div class="bg-gray-50 p-4 flex justify-center gap-4 rounded-b-xl">
+      <button id="cancelButton"
+              class="px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+        Cancelar
+      </button>
+      <button id="confirmButton"
+              class="px-6 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700">
+        Confirmar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ==== SCRIPTS ==== -->
 <script>
-    // --- LÓGICA DE ACCESO (PIN) Y NAVEGACIÓN BÁSICA ---
-    window.addEventListener("load", () => {
-        document.getElementById("loader").style.display = "none";
+  /* --------------------------------------------------------------
+   *  PIN
+   * -------------------------------------------------------------- */
+  function checkPIN() {
+    const pin = document.getElementById('pinInput').value;
+    if (pin === '2548') {
+      document.getElementById('pinScreen').style.display = 'none';
+      document.getElementById('appContent').style.display = 'block';
+    } else {
+      document.getElementById('errorMsg').classList.remove('hidden');
+    }
+  }
+
+  /* --------------------------------------------------------------
+   *  CARGADOR
+   * -------------------------------------------------------------- */
+  window.addEventListener('load', () => {
+    document.getElementById('loader').style.display = 'none';
+  });
+
+  /* --------------------------------------------------------------
+   *  LOGOUT
+   * -------------------------------------------------------------- */
+  function logoutApp() {
+    document.getElementById('appContent').style.display = 'none';
+    document.getElementById('pinScreen').style.display = 'block';
+    document.getElementById('pinInput').value = '';
+    document.getElementById('errorMsg').classList.add('hidden');
+  }
+
+  /* --------------------------------------------------------------
+   *  MOBILE DRAWER
+   * -------------------------------------------------------------- */
+  function toggleMobileDrawer() {
+    document.getElementById('mobileDrawer').classList.toggle('active');
+    document.getElementById('mobileDrawer').classList.toggle('hidden');
+  }
+
+  /* --------------------------------------------------------------
+   *  FIREBASE
+   * -------------------------------------------------------------- */
+  //--- Configuración (usa tus propios datos) ---------------------------------
+  const firebaseConfig = {
+    apiKey: "AIzaSyA26sad8msWrNTVByMs8umSUV_OJsqctuE",
+    authDomain: "mikelaneako.firebaseapp.com",
+    projectId: "mikelaneako",
+    storageBucket: "mikelaneako.firebasestorage.app",
+    messagingSenderId: "261413636045",
+    appId: "1:261413636045:web:717b7e87d84a345e816684"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  const storage = firebase.storage();
+  const auth = firebase.auth();
+
+  let allNotes = [];
+  let DOM = {};
+  // Archivos seleccionados (nuevo / existentes)
+  let currentSelectedFiles = [];
+
+  /* --------------------------------------------------------------
+   *  INICIALIZACIÓN
+   * -------------------------------------------------------------- */
+  window.onload = () => {
+    initDOM();
+    bindEvents();
+
+    auth.signInAnonymously()
+        .then(() => {
+          DOM.appHeader.classList.remove('hidden');
+          DOM.appMain.classList.remove('hidden');
+          showView('search');
+          loadNotes();
+        })
+        .catch(err => {
+          console.error('Auth error', err);
+          showToast('Error de autenticación.', 'error');
+          DOM.appHeader.classList.remove('hidden');
+          DOMMain.classList.remove('hidden');
+          showView('search');
+        });
+  };
+
+  function initDOM() {
+    DOM = {
+      appHeader:           document.getElementById('app-header'),
+      appMain:             document.getElementById('app-main'),
+      mainSearchView:      document.getElementById('main-search-view'),
+      allItemsView:        document.getElementById('all-items-view'),
+      notesContainer:      document.getElementById('notes-container'),
+      searchInput:         document.getElementById('searchInput'),
+      mainSearchInput:     document.getElementById('mainSearchInput'),
+      mainSearchButton:    document.getElementById('mainSearchButton'),
+      loadingIndicator:    document.getElementById('loading-indicator'),
+      noNotesMessage:      document.getElementById('no-notes-message'),
+      noResultsMessage:    document.getElementById('no-results-message'),
+      logoButton:          document.getElementById('logoButton'),
+      viewAllButton:       document.getElementById('viewAllButton'),
+      mfcButton:           document.getElementById('mfcButton'),
+      mfcModal:            document.getElementById('mfcModal'),
+      addItemButtonHeader: document.getElementById('addItemButtonHeader'),
+      addNoteModal:        document.getElementById('addNoteModal'),
+      addNoteForm:         document.getElementById('addNoteForm'),
+      modalTitle:          document.getElementById('modalTitle'),
+      noteIdToEdit:        document.getElementById('noteIdToEdit'),
+      noteTitleInput:      document.getElementById('noteTitle'),
+      noteContentInput:    document.getElementById('noteContent'),
+      noteAttachmentInput: document.getElementById('noteAttachment'),
+      noteAttachmentLabel: document.getElementById('noteAttachmentLabel'),
+      selectedFilesContainer: document.getElementById('selected-files-container'),
+      fileChosenList:      document.getElementById('file-chosen-list'),
+      noFilesSelectedMessage: document.getElementById('no-files-selected-message'),
+      saveNoteButton:      document.getElementById('saveNoteButton'),
+      confirmationModal:   document.getElementById('confirmationModal'),
+      confirmationMessage: document.getElementById('confirmationMessage'),
+      confirmButton:       document.getElementById('confirmButton'),
+      cancelButton:        document.getElementById('cancelButton'),
+      toastContainer:      document.getElementById('toast-container'),
+      webSearchDropdownBtn: document.getElementById('webSearchDropdownBtn'),
+      webSearchDropdownMenu: document.getElementById('webSearchDropdownMenu'),
+      menuToggleBtn:       document.getElementById('menuToggleBtn'),
+      mobileDrawer:        document.getElementById('mobileDrawer'),
+      mobileViewAllButton: document.getElementById('mobileViewAllButton'),
+      mobileAddItemButton: document.getElementById('mobileAddItemButton'),
+      mobileMfcButton:     document.getElementById('mobileMfcButton')
+    };
+  }
+
+  function bindEvents() {
+    // Header
+    DOM.logoButton.addEventListener('click', () => showView('search'));
+    DOM.viewAllButton.addEventListener('click', () => {
+      DOM.searchInput.value = '';
+      renderNotes(allNotes);
+      showView('items');
+    });
+    DOM.mfcButton.addEventListener('click', () => toggleModal('mfcModal', true));
+    DOM.addItemButtonHeader.addEventListener('click', openAddModal);
+
+    // Mobile drawer
+    DOM.menuToggleBtn.addEventListener('click', () => toggleMobileDrawer());
+    DOM.mobileViewAllButton.addEventListener('click', () => {
+      DOM.searchInput.value = '';
+      renderNotes(allNotes);
+      showView('items');
+      toggleMobileDrawer();
+    });
+    DOM.mobileAddItemButton.addEventListener('click', () => {
+      openAddModal();
+      toggleMobileDrawer();
+    });
+    DOM.mobileMfcButton.addEventListener('click', () => {
+      toggleModal('mfcModal', true);
+      toggleMobileDrawer();
     });
 
-    function checkPIN() {
-        const pin = document.getElementById("pinInput").value;
-        if (pin === "2548") {
-            document.getElementById("pinScreenContainer").style.display = "none";
-            document.getElementById("appContent").style.display = "block";
-            initializeApp(); 
-        } else {
-            const errorMsg = document.getElementById("errorMsg");
-            errorMsg.classList.remove("hidden");
-            const pinScreen = document.getElementById("pinScreen");
-            pinScreen.classList.add('animate-shake');
-            setTimeout(() => pinScreen.classList.remove('animate-shake'), 500);
-        }
-    }
+    // Search
+    DOM.mainSearchButton.addEventListener('click', () => performSearch(DOM.mainSearchInput.value, 'db'));
+    DOM.mainSearchInput.addEventListener('keypress', e => {
+      if (e.key === 'Enter') performSearch(DOM.mainSearchInput.value, 'db');
+    });
+    DOM.searchInput.addEventListener('input', () => filterNotes(DOM.searchInput.value));
 
-    function logoutApp() {
-        // En modo anónimo, recargar la página es la forma más simple de "cerrar sesión"
-        window.location.reload();
+    // Modals
+    document.querySelectorAll('.modal-close')
+            .forEach(btn => btn.addEventListener('click', () => toggleModal(btn.dataset.modal, false)));
+    DOM.saveNoteButton.addEventListener('click', saveNote);
+    DOM.noteAttachmentInput.addEventListener('change', handleFileSelect);
+    DOM.cancelButton.addEventListener('click', () => toggleModal('confirmationModal', false));
+
+    // Dropdown web search
+    DOM.webSearchDropdownBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      DOM.webSearchDropdownMenu.classList.toggle('active');
+    });
+    document.addEventListener('click', e => {
+      if (!DOM.webSearchDropdownBtn.contains(e.target) && !DOM.webSearchDropdownMenu.contains(e.target))
+        DOM.webSearchDropdownMenu.classList.remove('active');
+    });
+    document.getElementById('dropdown-copytech-btn')
+            .addEventListener('click', () => {
+              performSearch(DOM.mainSearchInput.value, 'copytech');
+              DOM.webSearchDropdownMenu.classList.remove('active');
+            });
+    document.getElementById('dropdown-printcopy-btn')
+            .addEventListener('click', () => {
+              performSearch(DOM.mainSearchInput.value, 'printcopy');
+              DOM.webSearchDropdownMenu.classList.remove('active');
+            });
+    document.getElementById('dropdown-google-btn')
+            .addEventListener('click', () => {
+              performSearch(DOM.mainSearchInput.value, 'google');
+              DOM.webSearchDropdownMenu.classList.remove('active');
+            });
+  }
+
+  /* --------------------------------------------------------------
+   *  VISTAS
+   * -------------------------------------------------------------- */
+  function showView(name) {
+    DOM.mainSearchView.classList.toggle('hidden', name !== 'search');
+    DOM.allItemsView.classList.toggle('hidden', name !== 'items');
+  }
+
+  /* --------------------------------------------------------------
+   *  BÚSQUEDA
+   * -------------------------------------------------------------- */
+  function performSearch(term, type) {
+    if (!term) return showToast('Introduce un término de búsqueda.', 'error');
+
+    if (type === 'db') {
+      filterNotes(term);
+      showView('items');
+    } else {
+      const urlMap = {
+        copytech: `https://www.google.com/search?q=${encodeURIComponent(term)}+site:copytechnet.com`,
+        printcopy:`https://www.google.com/search?q=${encodeURIComponent(term)}+site:printcopy.info`,
+        google:   `https://www.google.com/search?q=${encodeURIComponent(term)}`
+      };
+      window.location.href = urlMap[type];
     }
+  }
+
+  function filterNotes(term) {
+    const lower = term.toLowerCase();
+    DOM.searchInput.value = lower;
+    DOM.mainSearchInput.value = lower;
+    const filtered = allNotes.filter(n =>
+      n.titulo.toLowerCase().includes(lower) ||
+      n.descripcion.toLowerCase().includes(lower) ||
+      (n.attachments && n.attachments.some(a => a.name.toLowerCase().includes(lower)))
+    );
+    renderNotes(filtered);
+  }
+
+  /* --------------------------------------------------------------
+   *  CRUD FIREBASE
+   * -------------------------------------------------------------- */
+  function loadNotes() {
+    DOM.loadingIndicator.classList.remove('hidden');
+    db.collection('notas')
+      .orderBy('fecha', 'desc')
+      .onSnapshot(snapshot => {
+        allNotes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        renderNotes(allNotes);
+        DOM.loadingIndicator.classList.add('hidden');
+      }, err => {
+        console.error('Load notes error', err);
+        showToast('Error al cargar notas.', 'error');
+        DOM.loadingIndicator.classList.add('hidden');
+      });
+  }
+
+  async function saveNote() {
+    const title   = DOM.noteTitleInput.value.trim();
+    const content = DOM.noteContentInput.value.trim();
+    const noteId  = DOM.noteIdToEdit.value;
+
+    if (!title || !content) return showToast('Título y contenido obligatorios.', 'error');
+
+    DOM.saveNoteButton.disabled = true;
+    DOM.saveNoteButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Guardando...';
+
+    try {
+      let finalAttachments = [];
+
+      // ---------- EDIT ----------
+      if (noteId) {
+        const existing = allNotes.find(n => n.id === noteId);
+        const existingAtt = existing.attachments || [];
+
+        // Archivos que se eliminarán del storage
+        const toDelete = existingAtt.filter(ea =>
+          !currentSelectedFiles.some(sf => sf.name === ea.name && sf.isExisting)
+        );
+        for (const del of toDelete) {
+          if (del.path) await storage.ref(del.path).delete().catch(() => {});
+        }
+
+        // Nuevos archivos a subir
+        const newFiles = currentSelectedFiles.filter(f => !f.isExisting);
+        const uploaded = await uploadFiles(newFiles);
+
+        // Mantener los que siguen seleccionados y son existentes
+        const unchanged = currentSelectedFiles.filter(f => f.isExisting);
+        finalAttachments = [...unchanged, ...uploaded];
+      }
+      // ---------- CREATE ----------
+      else if (currentSelectedFiles.length) {
+        finalAttachments = await uploadFiles(currentSelectedFiles);
+      }
+
+      const noteData = {
+        titulo: title,
+        descripcion: content,
+        attachments: finalAttachments,
+        fecha: firebase.firestore.Timestamp.fromDate(new Date())
+      };
+
+      if (noteId) {
+        await db.collection('notas').doc(noteId).update(noteData);
+        showToast('Item actualizado.', 'success');
+      } else {
+        await db.collection('notas').add(noteData);
+        showToast('Item añadido.', 'success');
+      }
+
+      toggleModal('addNoteModal', false);
+    } catch (e) {
+      console.error(e);
+      showToast('Error al guardar la nota.', 'error');
+    } finally {
+      DOM.saveNoteButton.disabled = false;
+      DOM.saveNoteButton.innerHTML = 'Guardar Item';
+    }
+  }
+
+  async function uploadFiles(files) {
+    const promises = files.map(async f => {
+      const ref = storage.ref('adjuntos/' + Date.now() + '-' + f.name);
+      await ref.put(f);
+      const url = await ref.getDownloadURL();
+      return { url, path: ref.fullPath, name: f.name };
+    });
+    return Promise.all(promises);
+  }
+
+  function confirmDelete(noteId) {
+    showConfirmation('¿Seguro que quieres eliminar esta nota? No se puede deshacer.',
+      () => deleteNote(noteId));
+  }
+
+  async function deleteNote(noteId) {
+    try {
+      const doc = await db.collection('notas').doc(noteId).get();
+      if (doc.exists) {
+        const data = doc.data();
+        if (data.attachments) {
+          for (const att of data.attachments) {
+            if (att.path) await storage.ref(att.path).delete().catch(() => {});
+          }
+        }
+        await db.collection('notas').doc(noteId).delete();
+        showToast('Nota eliminada.', 'success');
+      }
+    } catch (e) {
+      console.error(e);
+      showToast('Error al eliminar la nota.', 'error');
+    }
+  }
+
+  /* --------------------------------------------------------------
+   *  MODALS & UI
+   * -------------------------------------------------------------- */
+  function toggleModal(id, show) {
+    const m = document.getElementById(id);
+    if (show) m.classList.add('active');
+    else {
+      m.classList.remove('active');
+      if (id === 'addNoteModal') resetAddForm();
+    }
+  }
+
+  function openAddModal() {
+    resetAddForm();
+    DOM.modalTitle.textContent = 'Añadir Nuevo Item';
+    toggleModal('addNoteModal', true);
+  }
+
+  function openEditModal(note) {
+    resetAddForm();
+    DOM.modalTitle.textContent = 'Editar Item';
+    DOM.noteIdToEdit.value = note.id;
+    DOM.noteTitleInput.value = note.titulo;
+    DOM.noteContentInput.value = note.descripcion;
+
+    if (note.attachments && note.attachments.length) {
+      currentSelectedFiles = note.attachments.map(att => ({
+        name: att.name,
+        url: att.url,
+        path: att.path,
+        isExisting: true
+      }));
+      renderSelectedFiles();
+    } else clearSelectedFiles();
+
+    toggleModal('addNoteModal', true);
+  }
+
+  function resetAddForm() {
+    DOM.addNoteForm.reset();
+    DOM.noteIdToEdit.value = '';
+    clearSelectedFiles();
+  }
+
+  /* --------- FILES (adjuntos) --------- */
+  function handleFileSelect(e) {
+    const newFiles = Array.from(e.target.files);
+    const uniq = newFiles.filter(f =>
+      !currentSelectedFiles.some(s => s.name === f.name && s.size === f.size)
+    );
+    currentSelectedFiles = [...currentSelectedFiles, ...uniq];
+    renderSelectedFiles();
+    e.target.value = ''; // permitir volver a seleccionar los mismos archivos
+  }
+
+  function renderSelectedFiles() {
+    DOM.fileChosenList.innerHTML = '';
+    if (currentSelectedFiles.length) {
+      DOM.noFilesSelectedMessage.classList.add('hidden');
+      currentFiles.forEach((f, i) => {
+        const div = document.createElement('div');
+        div.className = 'flex items-center justify-between bg-white border border-gray-200 rounded-md p-2 text-sm text-gray-700';
+        div.innerHTML = `
+          <span>${escapeHTML(f.name)}</span>
+          <button type="button" class="text-red-500 hover:text-red-700 ml-2" data-index="${i}">
+            <i class="fas fa-times"></i>
+          </button>`;
+        DOM.fileChosenList.appendChild(div);
+      });
+      // listeners de borrado individual
+      DOM.fileChosenList.querySelectorAll('button')
+          .forEach(btn => btn.addEventListener('click', e => {
+            const idx = parseInt(e.currentTarget.dataset.index);
+            currentSelectedFiles.splice(idx, 1);
+            renderSelectedFiles();
+          }));
+    } else {
+      DOM.noFilesSelectedMessage.classList.remove('hidden');
+    }
+  }
+
+  function clearSelectedFiles() {
+    DOM.noteAttachmentInput.value = '';
+    currentSelectedFiles = [];
+    renderSelectedFiles();
+  }
+
+  /* --------------------------------------------------------------
+   *  RENDER NOTAS
+   * -------------------------------------------------------------- */
+  function renderNotes(notes) {
+    DOM.notesContainer.innerHTML = '';
+    DOM.noResultsMessage.classList.toggle('hidden',
+      notes.length === 0 && DOM.searchInput.value !== '');
+    DOM.noNotesMessage.classList.toggle('hidden',
+      notes.length > 0);
+
+    notes.forEach(note => {
+      const card = document.createElement('div');
+      card.className = 'note-card bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex flex-col';
+
+      const attachHTML = (note.attachments && note.attachments.length)
+        ? note.attachments.map(a => `
+            <a href="${a.url}" target="_blank" rel="noopener noreferrer"
+               class="inline-flex items-center gap-2 text-sm text-blue-600 hover:underline mt-1">
+              <i class="fas fa-paperclip"></i><span>${escapeHTML(a.name || 'Adjunto')}</span>
+            </a>`).join('<br>')
+        : '';
+
+      const date = note.fecha ? new Date(note.fecha.seconds * 1000).toLocaleString() : 'N/A';
+
+      card.innerHTML = `
+        <div class="flex-grow">
+          <div class="flex justify-between items-start mb-2">
+            <h3 class="text-xl font-bold text-gray-900 pr-4">${escapeHTML(note.titulo)}</h3>
+            <p class="text-gray-600 whitespace-pre-wrap mb-4">${escapeHTML(note.descripcion)}</p>
+            <div class="flex items-center gap-3">
+              <button data-id="${note.id}" class="edit-note-btn text-gray-400 hover:text-blue-500"><i class="fas fa-pencil-alt"></i></button>
+              <button data-id="${note.id}" class="delete-note-btn text-gray-400 hover:text-red-500"><i class="fas fa-trash-alt"></i></button>
+            </div>
+          </div>
+        </div>
+        <div>
+          ${attachHTML}
+          <div class="text-right text-xs text-gray-400 mt-4">${date}</div>
+        </div>`;
+
+      DOM.notesContainer.appendChild(card);
+    });
+
+    // botones edit / delete
+    document.querySelectorAll('.edit-note-btn')
+            .forEach(b => b.addEventListener('click', e => {
+              e.stopPropagation();
+              const note = allNotes.find(n => n.id === e.currentTarget.dataset.id);
+              if (note) openEditModal(note);
+            }));
+    document.querySelectorAll('.delete-note-btn')
+            .forEach(b => b.addEventListener('click', e => {
+              e.stopPropagation();
+              confirmDelete(e.currentTarget.dataset.id);
+            }));
+  }
+
+  /* --------------------------------------------------------------
+   *  TOAST & CONFIRM
+   * -------------------------------------------------------------- */
+  function showToast(msg, type = 'success') {
+    const t = document.createElement('div');
+    t.className = `toast ${type}`;
+    t.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle'} mr-3"></i>${msg}`;
+    DOM.toastContainer.appendChild(t);
+    setTimeout(() => t.classList.add('show'), 10);
+    setTimeout(() => {
+      t.classList.remove('show');
+      t.addEventListener('transitionend', () => t.remove());
+    }, 4000);
+  }
+
+  function showConfirmation(msg, onConfirm) {
+    DOM.confirmationMessage.textContent = msg;
+
+    // limpiar listeners previos
+    const newBtn = DOM.confirmButton.cloneNode(true);
+    DOM.confirmButton.parentNode.replaceChild(newBtn, DOM.confirmButton);
+    DOM.confirmButton = newBtn;
+    DOM.confirmButton.onclick = () => {
+      toggleModal('confirmationModal', false);
+      onConfirm();
+    };
+    toggleModal('confirmationModal', true);
+  }
+
+  /* --------------------------------------------------------------
+   *  UTILIDADES
+   * -------------------------------------------------------------- */
+  function escapeHTML(str) {
+    const d = document.createElement('div');
+    d.appendChild(document.createTextNode(str));
+    return d.innerHTML;
+  }
 </script>
 
-<!-- Scripts de Firebase y de la Aplicación -->
-<script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-storage-compat.js"></script>
-<!-- AÑADIDO: Script de autenticación necesario -->
-<script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth-compat.js"></script>
-
+<!-- --------------------------------------------------------------
+     SERVICE WORKER (PWA) – se registra al final para que
+     no bloquee la carga inicial.
+  -------------------------------------------------------------- -->
 <script>
-    // --- LÓGICA PRINCIPAL DE LA APLICACIÓN ---
-
-    const firebaseConfig = {
-        apiKey: "TU_API_KEY_AQUI",
-        authDomain: "TU_AUTH_DOMAIN_AQUI",
-        projectId: "mikelaneako",
-        storageBucket: "TU_STORAGE_BUCKET_AQUI",
-        messagingSenderId: "TU_SENDER_ID_AQUI",
-        appId: "TU_APP_ID_AQUI"
-    };
-
-    // MODIFICADO: Añadida la variable `auth`
-    let db, storage, auth;
-    let allNotes = [];
-    let DOM = {};
-    let currentSelectedFiles = [];
-
-    // MODIFICADO: La función ahora incluye la autenticación anónima
-    function initializeApp() {
-        if (firebase.apps.length === 0) {
-            firebase.initializeApp(firebaseConfig);
-            db = firebase.firestore();
-            storage = firebase.storage();
-            auth = firebase.auth(); // Inicializa el servicio de autenticación
-        }
-        
-        // Inicia sesión de forma anónima para obtener permisos de escritura/lectura
-        auth.signInAnonymously()
-            .then(() => {
-                console.log("Usuario autenticado anónimamente con éxito.");
-
-                // Evita volver a añadir event listeners si la función se llama de nuevo por error
-                if (!Object.keys(DOM).length) {
-                    initializeDOMElements();
-                    setupEventListeners();
-                }
-                
-                // Muestra la aplicación y carga los datos
-                DOM.appHeader.classList.remove('hidden');
-                DOM.appMain.classList.remove('hidden');
-                showView('search');
-                loadNotes();
-            })
-            .catch((error) => {
-                console.error("Error al autenticar anónimamente:", error);
-                showToast("Fallo de autenticación. No se podrán guardar datos.", "error");
-            });
-    }
-    
-    function initializeDOMElements() {
-        DOM = {
-            appHeader: document.getElementById('app-header'),
-            appMain: document.getElementById('app-main'),
-            mainSearchView: document.getElementById('main-search-view'),
-            allItemsView: document.getElementById('all-items-view'),
-            notesContainer: document.getElementById('notes-container'),
-            searchInput: document.getElementById('searchInput'),
-            mainSearchInput: document.getElementById('mainSearchInput'),
-            mainSearchButton: document.getElementById('mainSearchButton'),
-            loadingIndicator: document.getElementById('loading-indicator'),
-            noNotesMessage: document.getElementById('no-notes-message'),
-            noResultsMessage: document.getElementById('no-results-message'),
-            logoButton: document.getElementById('logoButton'),
-            viewAllButton: document.getElementById('viewAllButton'),
-            mfcButton: document.getElementById('mfcButton'),
-            mfcModal: document.getElementById('mfcModal'),
-            addItemButtonHeader: document.getElementById('addItemButtonHeader'),
-            addNoteModal: document.getElementById('addNoteModal'),
-            addNoteForm: document.getElementById('addNoteForm'),
-            modalTitle: document.getElementById('modalTitle'),
-            noteIdToEdit: document.getElementById('noteIdToEdit'),
-            noteTitleInput: document.getElementById('noteTitle'),
-            noteContentInput: document.getElementById('noteContent'),
-            noteAttachmentInput: document.getElementById('noteAttachment'),
-            fileChosenList: document.getElementById('file-chosen-list'),
-            noFilesSelectedMessage: document.getElementById('no-files-selected-message'),
-            saveNoteButton: document.getElementById('saveNoteButton'),
-            confirmationModal: document.getElementById('confirmationModal'),
-            confirmationMessage: document.getElementById('confirmationMessage'),
-            confirmButton: document.getElementById('confirmButton'),
-            cancelButton: document.getElementById('cancelButton'),
-            toastContainer: document.getElementById('toast-container'),
-            webSearchDropdownBtn: document.getElementById('webSearchDropdownBtn'),
-            webSearchDropdownMenu: document.getElementById('webSearchDropdownMenu'),
-            menuToggleBtn: document.getElementById('menuToggleBtn'),
-            mobileMenu: document.getElementById('mobileMenu'),
-            closeMobileMenuBtn: document.getElementById('closeMobileMenuBtn'),
-            mobileViewAllButton: document.getElementById('mobileViewAllButton'),
-            mobileAddItemButton: document.getElementById('mobileAddItemButton'),
-            mobileMfcButton: document.getElementById('mobileMfcButton')
-        };
-    }
-
-    function setupEventListeners() {
-        DOM.logoButton.addEventListener('click', () => showView('search'));
-        DOM.viewAllButton.addEventListener('click', () => { DOM.searchInput.value = ''; renderNotes(allNotes); showView('items'); });
-        DOM.mfcButton.addEventListener('click', () => toggleModal('mfcModal', true));
-        DOM.mainSearchButton.addEventListener('click', () => performSearch(DOM.mainSearchInput.value, 'db'));
-        DOM.mainSearchInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') performSearch(DOM.mainSearchInput.value, 'db'); });
-        DOM.searchInput.addEventListener('input', () => filterNotes(DOM.searchInput.value));
-        DOM.addItemButtonHeader.addEventListener('click', () => openAddModal());
-        document.querySelectorAll('.modal-close').forEach(btn => btn.addEventListener('click', () => toggleModal(btn.dataset.modal, false)));
-        DOM.saveNoteButton.addEventListener('click', saveNote);
-        DOM.noteAttachmentInput.addEventListener('change', handleFileSelect);
-        DOM.cancelButton.addEventListener('click', () => toggleModal('confirmationModal', false));
-
-        DOM.webSearchDropdownBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            DOM.webSearchDropdownMenu.classList.toggle('active');
-        });
-        document.addEventListener('click', () => DOM.webSearchDropdownMenu.classList.remove('active'));
-        DOM.webSearchDropdownMenu.addEventListener('click', (e) => {
-            if(e.target.tagName === 'A') {
-                performSearch(DOM.mainSearchInput.value, e.target.dataset.type);
-                DOM.webSearchDropdownMenu.classList.remove('active');
-            }
-        });
-
-        DOM.menuToggleBtn.addEventListener('click', () => DOM.mobileMenu.classList.add('active'));
-        DOM.closeMobileMenuBtn.addEventListener('click', () => DOM.mobileMenu.classList.remove('active'));
-        
-        const closeMobileMenu = () => DOM.mobileMenu.classList.remove('active');
-        DOM.mobileViewAllButton.addEventListener('click', () => { DOM.viewAllButton.click(); closeMobileMenu(); });
-        DOM.mobileAddItemButton.addEventListener('click', () => { openAddModal(); closeMobileMenu(); });
-        DOM.mobileMfcButton.addEventListener('click', () => { toggleModal('mfcModal', true); closeMobileMenu(); });
-    }
-
-    // --- MANEJO DE VISTAS Y MODALES ---
-    function showView(viewName) {
-        DOM.mainSearchView.classList.toggle('hidden', viewName !== 'search');
-        DOM.allItemsView.classList.toggle('hidden', viewName !== 'items');
-        window.scrollTo(0, 0);
-    }
-
-    function toggleModal(modalId, show) {
-        const modal = document.getElementById(modalId);
-        if (modal) {
-            if (show) modal.classList.add('active');
-            else modal.classList.remove('active');
-            if (!show && modalId === 'addNoteModal') resetAddNoteForm();
-        }
-    }
-
-    // --- LÓGICA DE BÚSQUEDA ---
-    function performSearch(searchTerm, type) {
-        if (!searchTerm.trim()) {
-            showToast("Introduce un término de búsqueda.", "error");
-            return;
-        }
-        if (type === 'db') {
-            filterNotes(searchTerm);
-            showView('items');
-        } else {
-            let searchUrl;
-            if (type === 'copytech') {
-                searchUrl = `https://www.google.com/search?q=${encodeURIComponent(searchTerm)}+site:copytechnet.com`;
-            } else if (type === 'printcopy') {
-                searchUrl = `https://www.google.com/search?q=${encodeURIComponent(searchTerm)}+site:printcopy.info`;
-            } else { 
-                searchUrl = `https://www.google.com/search?q=${encodeURIComponent(searchTerm)}`;
-            }
-            window.open(searchUrl, '_blank');
-        }
-    }
-    
-    // --- LÓGICA DE GESTIÓN DE NOTAS (CRUD) ---
-    function openAddModal() {
-        resetAddNoteForm();
-        DOM.modalTitle.textContent = "Añadir Nuevo Item";
-        toggleModal('addNoteModal', true);
-    }
-
-    function openEditModal(note) {
-        resetAddNoteForm();
-        DOM.modalTitle.textContent = "Editar Item";
-        DOM.noteIdToEdit.value = note.id;
-        DOM.noteTitleInput.value = note.titulo;
-        DOM.noteContentInput.value = note.descripcion;
-
-        if (note.attachments && note.attachments.length > 0) {
-            currentSelectedFiles = note.attachments.map(att => ({ ...att, isExisting: true }));
-            renderSelectedFiles();
-        }
-        toggleModal('addNoteModal', true);
-    }
-
-    function resetAddNoteForm() {
-        DOM.addNoteForm.reset();
-        DOM.noteIdToEdit.value = '';
-        clearSelectedFiles();
-    }
-    
-    async function saveNote() {
-        const title = DOM.noteTitleInput.value.trim();
-        const content = DOM.noteContentInput.value.trim();
-        const noteId = DOM.noteIdToEdit.value;
-
-        if (!title || !content) {
-            showToast('El título y el contenido son obligatorios.', 'error');
-            return;
-        }
-
-        DOM.saveNoteButton.disabled = true;
-        DOM.saveNoteButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Guardando...';
-
-        try {
-            let finalAttachments = [];
-            const newFilesToUpload = currentSelectedFiles.filter(file => !file.isExisting);
-            const uploadedNewAttachments = await uploadFiles(newFilesToUpload);
-            
-            if (noteId) { // Editando
-                const existingNote = allNotes.find(n => n.id === noteId);
-                const attachmentsToKeep = currentSelectedFiles.filter(file => file.isExisting);
-                
-                const oldAttachments = existingNote.attachments || [];
-                const filesToDelete = oldAttachments.filter(oldAtt => 
-                    !attachmentsToKeep.some(keepAtt => keepAtt.path === oldAtt.path)
-                );
-                for (const file of filesToDelete) {
-                    if (file.path) await storage.ref(file.path).delete().catch(console.warn);
-                }
-                
-                finalAttachments = [...attachmentsToKeep, ...uploadedNewAttachments];
-            } else { // Creando
-                finalAttachments = uploadedNewAttachments;
-            }
-
-            const noteData = { 
-                titulo: title,
-                descripcion: content,
-                attachments: finalAttachments,
-                fecha: firebase.firestore.Timestamp.fromDate(new Date())
-            };
-
-            if (noteId) {
-                await db.collection("notas").doc(noteId).update(noteData);
-                showToast("Item actualizado.", "success");
-            } else {
-                await db.collection("notas").add(noteData);
-                showToast("Item añadido.", "success");
-            }
-            toggleModal('addNoteModal', false);
-        } catch (error) {
-            console.error("Error al guardar el item:", error);
-            showToast("No se pudo guardar el item. Revisa las reglas de seguridad de Firebase.", "error");
-        } finally {
-            DOM.saveNoteButton.disabled = false;
-            DOM.saveNoteButton.innerHTML = 'Guardar Item';
-        }
-    }
-    
-    async function deleteNote(noteId) {
-        try {
-            const noteRef = db.collection("notas").doc(noteId);
-            const noteDoc = await noteRef.get();
-            if (noteDoc.exists) {
-                const noteData = noteDoc.data();
-                if (noteData.attachments && noteData.attachments.length > 0) {
-                    for (const attachment of noteData.attachments) {
-                        if (attachment.path) await storage.ref(attachment.path).delete().catch(console.warn);
-                    }
-                }
-            }
-            await noteRef.delete();
-            showToast("Item eliminado.", "success");
-        } catch (error) {
-            console.error("Error al eliminar el item: ", error);
-            showToast('No se pudo eliminar el item.', 'error');
-        }
-    }
-
-    function loadNotes() {
-        DOM.loadingIndicator.classList.remove('hidden');
-        db.collection("notas").orderBy("fecha", "desc").onSnapshot((snapshot) => {
-            allNotes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            renderNotes(allNotes); 
-            DOM.loadingIndicator.classList.add('hidden');
-        }, (error) => {
-            console.error("Error al cargar los items: ", error);
-            showToast("Error al cargar los items.", "error");
-            DOM.loadingIndicator.classList.add('hidden');
-        });
-    }
-
-    // --- MANEJO DE ADJUNTOS ---
-    function handleFileSelect(e) {
-        const newFiles = Array.from(e.target.files);
-        const uniqueNewFiles = newFiles.filter(newFile =>
-            !currentSelectedFiles.some(existingFile =>
-                existingFile.name === newFile.name && existingFile.size === newFile.size
-            )
-        );
-        currentSelectedFiles.push(...uniqueNewFiles);
-        renderSelectedFiles();
-        e.target.value = ''; 
-    }
-
-    function renderSelectedFiles() {
-        DOM.fileChosenList.innerHTML = '';
-        DOM.noFilesSelectedMessage.classList.toggle('hidden', currentSelectedFiles.length > 0);
-        currentSelectedFiles.forEach((file, index) => {
-            const fileItem = document.createElement('div');
-            fileItem.className = 'flex items-center justify-between bg-white border border-gray-200 rounded-md p-2 text-sm text-gray-700';
-            fileItem.innerHTML = `
-                <span class="truncate pr-2">${escapeHTML(file.name)}</span>
-                <button type="button" class="text-red-500 hover:text-red-700 ml-2 flex-shrink-0" data-index="${index}">
-                    <i class="fas fa-times"></i>
-                </button>
-            `;
-            fileItem.querySelector('button').addEventListener('click', () => removeIndividualFile(index));
-            DOM.fileChosenList.appendChild(fileItem);
-        });
-    }
-
-    function removeIndividualFile(index) {
-        currentSelectedFiles.splice(index, 1);
-        renderSelectedFiles();
-    }
-
-    function clearSelectedFiles() {
-        DOM.noteAttachmentInput.value = '';
-        currentSelectedFiles = [];
-        renderSelectedFiles();
-    }
-    
-    async function uploadFiles(files) {
-        const uploadPromises = files.map(async (file) => {
-            const storageRef = storage.ref(`adjuntos/${Date.now()}-${file.name}`);
-            await storageRef.put(file);
-            const url = await storageRef.getDownloadURL();
-            return { url, path: storageRef.fullPath, name: file.name };
-        });
-        return await Promise.all(uploadPromises);
-    }
-    
-    // --- RENDERIZADO Y FILTRADO ---
-    function renderNotes(notes) {
-        DOM.notesContainer.innerHTML = '';
-        DOM.noNotesMessage.classList.toggle('hidden', allNotes.length > 0);
-        DOM.noResultsMessage.classList.toggle('hidden', notes.length > 0 || allNotes.length === 0);
-
-        notes.forEach(note => {
-            const noteElement = document.createElement('div');
-            noteElement.className = 'note-card bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex flex-col justify-between';
-            
-            const attachmentsHTML = (note.attachments && note.attachments.length > 0)
-                ? `<div class="mt-4 space-y-2">` + note.attachments.map(att => `
-                    <a href="${att.url}" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 text-sm text-blue-600 hover:underline">
-                        <i class="fas fa-paperclip fa-fw"></i><span class="truncate">${escapeHTML(att.name || 'Adjunto')}</span>
-                    </a>`).join('') + `</div>`
-                : '';
-
-            const date = note.fecha ? new Date(note.fecha.seconds * 1000).toLocaleString('es-ES') : 'N/A';
-            
-            noteElement.innerHTML = `
-                <div>
-                    <div class="flex justify-between items-start gap-4">
-                        <h3 class="text-xl font-bold text-gray-900 flex-grow break-words">${escapeHTML(note.titulo)}</h3>
-                        <div class="flex items-center gap-3 flex-shrink-0">
-                            <button data-id="${note.id}" class="edit-note-btn text-gray-400 hover:text-blue-500"><i class="fas fa-pencil-alt"></i></button>
-                            <button data-id="${note.id}" class="delete-note-btn text-gray-400 hover:text-red-500"><i class="fas fa-trash-alt"></i></button>
-                        </div>
-                    </div>
-                    <p class="text-gray-600 whitespace-pre-wrap mt-2 mb-4 break-words">${escapeHTML(note.descripcion)}</p>
-                </div>
-                <div class="mt-auto">
-                    ${attachmentsHTML}
-                    <div class="text-right text-xs text-gray-400 mt-4">${date}</div>
-                </div>`;
-            
-            DOM.notesContainer.appendChild(noteElement);
-        });
-
-        DOM.notesContainer.querySelectorAll('.delete-note-btn').forEach(b => b.addEventListener('click', (e) => confirmDelete(e.currentTarget.dataset.id)));
-        DOM.notesContainer.querySelectorAll('.edit-note-btn').forEach(b => b.addEventListener('click', (e) => {
-            const noteToEdit = allNotes.find(n => n.id === e.currentTarget.dataset.id);
-            if(noteToEdit) openEditModal(noteToEdit);
-        }));
-    }
-
-    function filterNotes(searchTerm) {
-        const term = searchTerm.toLowerCase().trim();
-        DOM.searchInput.value = term;
-        DOM.mainSearchInput.value = term;
-        const filtered = allNotes.filter(n => 
-            n.titulo.toLowerCase().includes(term) || 
-            n.descripcion.toLowerCase().includes(term) || 
-            (n.attachments && n.attachments.some(att => att.name.toLowerCase().includes(term)))
-        );
-        renderNotes(filtered);
-    }
-    
-    // --- UTILIDADES ---
-    function escapeHTML(str) { 
-        return str.replace(/[&<>"']/g, match => ({'&': '&amp;','<': '&lt;','>': '&gt;','"': '&quot;',"'": '&#39;'})[match]);
-    }
-
-    function confirmDelete(noteId) {
-        showConfirmationModal("¿Seguro que quieres eliminar este item y todos sus adjuntos? Esta acción no se puede deshacer.", () => deleteNote(noteId));
-    }
-
-    function showConfirmationModal(message, onConfirmCallback) {
-        DOM.confirmationMessage.textContent = message;
-        const newConfirmButton = DOM.confirmButton.cloneNode(true);
-        DOM.confirmButton.parentNode.replaceChild(newConfirmButton, DOM.confirmButton);
-        DOM.confirmButton = newConfirmButton;
-        DOM.confirmButton.addEventListener('click', () => { 
-            toggleModal('confirmationModal', false); 
-            onConfirmCallback(); 
-        });
-        toggleModal('confirmationModal', true);
-    }
-
-    function showToast(message, type = 'success') {
-        const toast = document.createElement('div');
-        toast.className = `toast ${type}`;
-        toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle'} mr-3"></i> ${message}`;
-        DOM.toastContainer.appendChild(toast);
-        setTimeout(() => toast.classList.add('show'), 10);
-        setTimeout(() => {
-            toast.classList.remove('show');
-            toast.addEventListener('transitionend', () => toast.remove());
-        }, 4000);
-    }
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js')
+        .then(reg => console.log('SW registrado', reg))
+        .catch(err => console.warn('SW registro falló', err));
+    });
+  }
 </script>
 </body>
 </html>
