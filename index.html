@@ -5,11 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Acceso Seguro</title>
 
-<!-- 1️⃣  Manifest & favicons (PWA)<link rel="manifest" href="manifest.json">
+<link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <meta name="theme-color" content="#4f46e5">
 
-<!-- 2️⃣  CSS y fuentes -->
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"/>
@@ -24,6 +23,7 @@
     .note-card { flex-direction: column !important; align-items: flex-start !important; }
     .note-card .items-end { align-self: flex-end; margin-top: 1rem; }
     #pinScreen { padding: 2rem; }
+    .main-search-container { padding: 1rem; }
   }
   body {font-family: 'Inter', sans-serif; background-color:#f8f9fa;}
   .main-search-container{min-height:calc(100vh - 200px);display:flex;align-items:center;justify-content:center;}
@@ -63,20 +63,17 @@
 
 <body class="bg-gray-100 flex items-center justify-center h-screen">
 
-<!-- ==== LOGOUT (desktop) ==== -->
 <div class="hidden md:block fixed top-4 right-4 z-50">
   <button class="text-gray-700 bg-white p-2 rounded shadow-md hover:bg-gray-100"
           onclick="logoutApp()"><i class="fas fa-sign-out-alt"></i></button>
 </div>
 
-<!-- ==== MENU HAMBURGUESA (mobile) ==== -->
 <div class="md:hidden fixed top-4 left-4 z-50">
   <button class="text-gray-700 bg-white p-2 rounded shadow-md"
           onclick="toggleMobileDrawer()"><i class="fas fa-bars fa-lg"></i></button>
 </div>
 
-<!-- ==== DRAWER MOBILE (renombrado para evitar conflicto) ==== -->
-<div id="mobileDrawer" class="fixed inset-y-0 left-0 w-64 bg-white shadow-lg p-6 z-50 mobile-drawer hidden md:hidden">
+<div id="mobileDrawer" class="fixed inset-y-0 left-0 w-64 bg-white shadow-lg p-6 z-50 mobile-drawer md:hidden">
   <div class="flex justify-between items-center mb-6">
     <h3 class="text-xl font-bold">Menú</h3>
     <button class="text-gray-700 text-2xl" onclick="toggleMobileDrawer()"><i class="fas fa-times"></i></button>
@@ -91,7 +88,6 @@
   </div>
 </div>
 
-<!-- ==== CARGADOR (sólo una vez) ==== -->
 <div id="loader" class="fixed inset-0 flex items-center justify-center bg-white z-50">
   <div class="text-center space-y-4">
     <svg class="animate-spin h-10 w-10 text-blue-600 mx-auto" fill="none"
@@ -105,7 +101,6 @@
   </div>
 </div>
 
-<!-- ==== PIN SCREEN ==== -->
 <div id="pinScreen" class="text-center space-y-6">
   <h1 class="text-2xl font-bold">Introduce el PIN para acceder</h1>
   <input id="pinInput" maxlength="4" placeholder="PIN"
@@ -118,10 +113,8 @@
   <p id="errorMsg" class="text-red-500 font-medium hidden">PIN incorrecto</p>
 </div>
 
-<!-- ==== APP CONTENT (oculto hasta pasar PIN) ==== -->
 <div id="appContent" style="display:none;">
 
-  <!-- -------- HEADER -------- -->
   <header id="app-header"
           class="bg-white/80 backdrop-blur-lg sticky top-0 z-40 border-b border-gray-200 hidden">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -134,7 +127,6 @@
             </span> Mikel
           </button>
         </div>
-        <!-- NAV (desktop) -->
         <nav class="hidden md:flex items-center gap-3">
           <button id="viewAllButton"
                   class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
@@ -149,21 +141,17 @@
             <i class="fa-solid fa-plus"></i> Añadir Item
           </button>
         </nav>
-        <!-- HAMBURGER (mobile) -->
         <button id="menuToggleBtn"
                 class="md:hidden text-gray-700 text-2xl"><i class="fas fa-bars"></i></button>
       </div>
     </div>
   </header>
 
-  <!-- -------- MAIN -------- -->
   <main id="app-main"
         class="container mx-auto p-4 sm:p-6 lg:p-8 hidden">
 
-    <!-- TOASTS -->
     <div id="toast-container"></div>
 
-    <!-- ---------- SEARCH VIEW ---------- -->
     <section id="main-search-view">
       <div class="main-search-container">
         <div class="text-center w-full max-w-2xl">
@@ -207,7 +195,6 @@
       </div>
     </section>
 
-    <!-- ---------- ALL ITEMS VIEW ---------- -->
     <section id="all-items-view" class="hidden">
       <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-bold">Base de Conocimiento</h2>
@@ -248,7 +235,6 @@
   </main>
 </div>
 
-<!-- ==== MODAL ADD / EDIT NOTE ==== -->
 <div id="addNoteModal"
      class="modal fixed inset-0 bg-gray-900 bg-opacity-75 items-center justify-center p-4 overflow-y-auto">
   <div class="modal-content bg-white rounded-xl shadow-2xl w-full max-w-2xl">
@@ -311,7 +297,6 @@
   </div>
 </div>
 
-<!-- ==== MODAL RECURSOS ==== -->
 <div id="mfcModal"
      class="modal fixed inset-0 bg-gray-900 bg-opacity-75 items-center justify-center p-4 overflow-y-auto">
   <div class="modal-content bg-white rounded-xl shadow-2xl w-full max-w-lg">
@@ -345,7 +330,6 @@
   </div>
 </div>
 
-<!-- ==== MODAL CONFIRMACIÓN ==== -->
 <div id="confirmationModal"
      class="modal fixed inset-0 bg-gray-900 bg-opacity-75 items-center justify-center p-4">
   <div class="modal-content bg-white rounded-xl shadow-2xl w-full max-w-md">
@@ -367,10 +351,9 @@
   </div>
 </div>
 
-<!-- ==== SCRIPTS ==== -->
 <script>
   /* --------------------------------------------------------------
-   *  PIN
+   * PIN
    * -------------------------------------------------------------- */
   function checkPIN() {
     const pin = document.getElementById('pinInput').value;
@@ -383,14 +366,14 @@
   }
 
   /* --------------------------------------------------------------
-   *  CARGADOR
+   * CARGADOR
    * -------------------------------------------------------------- */
   window.addEventListener('load', () => {
     document.getElementById('loader').style.display = 'none';
   });
 
   /* --------------------------------------------------------------
-   *  LOGOUT
+   * LOGOUT
    * -------------------------------------------------------------- */
   function logoutApp() {
     document.getElementById('appContent').style.display = 'none';
@@ -400,15 +383,14 @@
   }
 
   /* --------------------------------------------------------------
-   *  MOBILE DRAWER
+   * MOBILE DRAWER
    * -------------------------------------------------------------- */
   function toggleMobileDrawer() {
     document.getElementById('mobileDrawer').classList.toggle('active');
-    document.getElementById('mobileDrawer').classList.toggle('hidden');
   }
 
   /* --------------------------------------------------------------
-   *  FIREBASE
+   * FIREBASE
    * -------------------------------------------------------------- */
   //--- Configuración (usa tus propios datos) ---------------------------------
   const firebaseConfig = {
@@ -430,7 +412,7 @@
   let currentSelectedFiles = [];
 
   /* --------------------------------------------------------------
-   *  INICIALIZACIÓN
+   * INICIALIZACIÓN
    * -------------------------------------------------------------- */
   window.onload = () => {
     initDOM();
@@ -566,7 +548,7 @@
   }
 
   /* --------------------------------------------------------------
-   *  VISTAS
+   * VISTAS
    * -------------------------------------------------------------- */
   function showView(name) {
     DOM.mainSearchView.classList.toggle('hidden', name !== 'search');
@@ -574,7 +556,7 @@
   }
 
   /* --------------------------------------------------------------
-   *  BÚSQUEDA
+   * BÚSQUEDA
    * -------------------------------------------------------------- */
   function performSearch(term, type) {
     if (!term) return showToast('Introduce un término de búsqueda.', 'error');
@@ -605,7 +587,7 @@
   }
 
   /* --------------------------------------------------------------
-   *  CRUD FIREBASE
+   * CRUD FIREBASE
    * -------------------------------------------------------------- */
   function loadNotes() {
     DOM.loadingIndicator.classList.remove('hidden');
@@ -721,7 +703,7 @@
   }
 
   /* --------------------------------------------------------------
-   *  MODALS & UI
+   * MODALS & UI
    * -------------------------------------------------------------- */
   function toggleModal(id, show) {
     const m = document.getElementById(id);
@@ -779,7 +761,7 @@
     DOM.fileChosenList.innerHTML = '';
     if (currentSelectedFiles.length) {
       DOM.noFilesSelectedMessage.classList.add('hidden');
-      currentFiles.forEach((f, i) => {
+      currentSelectedFiles.forEach((f, i) => {
         const div = document.createElement('div');
         div.className = 'flex items-center justify-between bg-white border border-gray-200 rounded-md p-2 text-sm text-gray-700';
         div.innerHTML = `
@@ -808,7 +790,7 @@
   }
 
   /* --------------------------------------------------------------
-   *  RENDER NOTAS
+   * RENDER NOTAS
    * -------------------------------------------------------------- */
   function renderNotes(notes) {
     DOM.notesContainer.innerHTML = '';
@@ -865,7 +847,7 @@
   }
 
   /* --------------------------------------------------------------
-   *  TOAST & CONFIRM
+   * TOAST & CONFIRM
    * -------------------------------------------------------------- */
   function showToast(msg, type = 'success') {
     const t = document.createElement('div');
@@ -894,7 +876,7 @@
   }
 
   /* --------------------------------------------------------------
-   *  UTILIDADES
+   * UTILIDADES
    * -------------------------------------------------------------- */
   function escapeHTML(str) {
     const d = document.createElement('div');
@@ -903,10 +885,6 @@
   }
 </script>
 
-<!-- --------------------------------------------------------------
-     SERVICE WORKER (PWA) – se registra al final para que
-     no bloquee la carga inicial.
-  -------------------------------------------------------------- -->
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
